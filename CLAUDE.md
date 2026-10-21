@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Site estático da **Gringos Washboard Band** (gringoswashboard.com), alojado no **Netlify**. Cada push na `main` dispara deploy. O `README.md` tem a documentação completa; este ficheiro é o resumo para trabalhar no código.
+Site estático da **Gringos Washboard Band** (gringoswashboard.com), por agora publicado no **GitHub Pages** a partir de `dist/` (`https://rdquintas.github.io/gringoswashboard.com/dist/`); o `netlify.toml` fica preparado para mais tarde. O `README.md` tem a documentação completa; este ficheiro é o resumo para trabalhar no código.
 
 Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens do build e commits. O conteúdo do site está em inglês.
 
@@ -23,8 +23,12 @@ Node 22 (`.nvmrc`, `netlify.toml`).
 
 - **`build.js`** — limpa `dist/` e copia `src/` para lá.
 - **`src/`** — ficheiros do site: `index.html`, `css/site.css` (estilos próprios), `images/`.
-- **`dist/`** — gerado; no `.gitignore` (o Netlify gera o seu).
+- **`dist/`** — gerado, mas **versionado** (o GitHub Pages serve-o e não corre build): correr `npm run build` e fazer commit de `dist/` junto com `src/`.
 - **`netlify.toml`** — `npm run build`, publica `dist`, Node 22, cabeçalhos de segurança.
+
+## Caminhos
+
+Como o site é servido num subcaminho do GitHub Pages, **todos os caminhos de recursos são relativos** (`css/site.css`, `images/hero.jpg`), nunca começam por `/`.
 
 ## Segurança / CSP
 
