@@ -1,0 +1,13 @@
+{
+  "name": "gringoswashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site do gringoswashboard.com",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "dev": "npm run build && npx serve dist"
+  }
+}

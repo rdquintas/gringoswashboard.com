@@ -1,0 +1,21 @@
+# Netlify: faz `npm run build` e publica a pasta dist/.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"   # igual ao .nvmrc
+
+# Cabeçalhos de segurança. A CSP só permite recursos do próprio domínio e não permite scripts inline.
+# Novos domínios externos (imagens, scripts, iframes, fontes) têm de ser acrescentados aqui.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+
+# HTML: o Netlify já serve por defeito "public, max-age=0, must-revalidate"
+# (o browser revalida sempre), por isso não é preciso definir aqui.
