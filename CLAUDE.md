@@ -6,7 +6,7 @@ Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens d
 
 ## Estado atual
 
-Ponto de partida mínimo: só `src/index.html` com um `<h1>`. **Sem CSS, sem JS, sem tema/template** — não acrescentar nada disto sem ser pedido. O build existe mas só copia `src/` → `dist/`. Sem dependências npm, testes nem linter: validar correndo `npm run build`.
+Ponto de partida mínimo: só `src/index.html` com um hero (`src/images/hero.jpg` em ecrã inteiro, `<h1>` centrado por cima), estilizado em `src/css/site.css`. **Sem JS, sem tema/template** — não acrescentar sem ser pedido. O build existe mas só copia `src/` → `dist/`. Sem dependências npm, testes nem linter: validar correndo `npm run build`.
 
 Inspiração para a evolução futura: o repositório [rdquintas/entrelinhasbar.com](https://github.com/rdquintas/entrelinhasbar.com) (build em Node que gera `dist/` a partir de YAML + templates).
 
@@ -22,7 +22,7 @@ Node 22 (`.nvmrc`, `netlify.toml`).
 ## Estrutura
 
 - **`build.js`** — limpa `dist/` e copia `src/` para lá.
-- **`src/`** — ficheiros do site.
+- **`src/`** — ficheiros do site: `index.html`, `css/site.css` (estilos próprios), `images/`.
 - **`dist/`** — gerado; no `.gitignore` (o Netlify gera o seu).
 - **`netlify.toml`** — `npm run build`, publica `dist`, Node 22, cabeçalhos de segurança.
 

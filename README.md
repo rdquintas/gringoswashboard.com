@@ -3,13 +3,15 @@
 Site estático da **Gringos Washboard Band**, alojado no **Netlify**. Cada `commit` na branch principal dispara um deploy automático. Sem backend, sem base de dados, sem segredos.
 
 - **Build:** Node.js (`build.js`) gera o site final em `dist/`. Por agora só copia `src/` para `dist/`.
-- **Conteúdo:** por agora é só uma página (`src/index.html`) com um título: sem CSS, sem JavaScript e sem tema.
+- **Conteúdo:** por agora é só uma página (`src/index.html`) com um hero (`src/images/hero.jpg` em ecrã inteiro e o título centrado por cima). Um CSS próprio (`src/css/site.css`), sem JavaScript e sem tema.
 
 ## Estrutura
 
 ```
 src/              ficheiros do site (copiados para dist/ pelo build)
   index.html      página inicial
+  css/site.css    estilos próprios do site
+  images/         imagens (hero.jpg)
 build.js          build: limpa dist/ e copia src/ para lá
 dist/             resultado do build (ignorado pelo Git; o Netlify gera o seu)
 netlify.toml      configuração do Netlify (comando, pasta publicada, Node 22, cabeçalhos de segurança)
