@@ -312,7 +312,9 @@ button { font: inherit; cursor: pointer; }
 .cookies a { color: var(--gold); text-decoration: underline; }
 .cookies-botoes { display: flex; gap: 10px; flex: none; }
 .cookies .btn { width: auto; padding: 10px 22px; font-size: 14px; }
-.copyright { color: #aaa; font-size: 14px; margin: 0; }
+.footer-logo { display: block; width: fit-content; margin: 20px auto 12px; }
+.footer-logo img { display: block; height: 160px; width: auto; }
+.copyright { color: #aaa; font-size: 14px; margin: 0; text-align: center; }
 .copyright a { color: var(--white); }
 .copyright a:hover { color: var(--gold); }
 
