@@ -282,6 +282,22 @@ async function main() {
     return ctas.length ? `      <div class="hero-cta">\n${ctas.join('\n')}\n      </div>\n` : '';
   };
 
+  // Hero do EPK (epk.yaml): `<!-- @epk-hero -->` em epk.html dá lugar à imagem `hero_horizontal`
+  // (.hero-h) e à `hero_vertical` (.hero-v, o CSS mostra-a só em ecrãs na vertical).
+  const epk = lerYaml(path.join(CONTEUDO, 'epk.yaml'));
+  const epkHero = (await Promise.all([['hero_horizontal', 'hero-h'], ['hero_vertical', 'hero-v']].map(async ([chave, classe]) => {
+    const img = String(epk[chave] ?? '').trim();
+    if (!img) throw new Error(`epk.yaml: falta \`${chave}\``);
+    if (!fs.existsSync(path.join(SRC, 'images', img))) throw new Error(`epk.yaml: \`${chave}\`: imagem não existe: images/${img}`);
+    if (!IMG_CONVERTIVEIS.test(img)) throw new Error(`epk.yaml: \`${chave}\` tem de ser PNG ou JPG: ${img}`);
+    const { width, height } = await sharp(path.join(SRC, 'images', img)).metadata();
+    return `<img class="${classe}" src="images/${img}" alt="" width="${width}" height="${height}" loading="lazy">`;
+  })));
+  // Imagem de partilha do EPK (`image_share`, images/og/_epk.jpg); vazia, fica a do site.yaml.
+  const epkPartilha = String(epk.image_share ?? '').trim();
+  if (epkPartilha && !fs.existsSync(path.join(SRC, 'images', epkPartilha))) throw new Error(`epk.yaml: \`image_share\`: imagem não existe: images/${epkPartilha}`);
+  if (epkPartilha && !IMG_CONVERTIVEIS.test(epkPartilha)) throw new Error(`epk.yaml: \`image_share\` tem de ser PNG ou JPG: ${epkPartilha}`);
+
   // Agenda (`section_agenda.gigs`): cada concerto com `isEnabled: true` tem uma página própria em cada
   // língua (`evento-<slug>.html`, slug a partir do `id`, gerada a partir de modelos/evento.html)
   // e, se a data for de hoje em diante (data do build), um <li> na .tour-list do index, por ordem
@@ -475,9 +491,11 @@ async function main() {
   // `<!-- @og -->` (no <head>): og:url e og:locale e, nas páginas dos concertos com
   // `imagem_v_4x5`, a imagem de partilha (og:title e og:description vêm do header).
   // As restantes páginas usam a `default_share_image` do site.yaml (images/og/_default.jpg; o `_`
-  // não aparece nos slugs, por isso não colide com nenhum concerto).
+  // não aparece nos slugs, por isso não colide com nenhum concerto), exceto o EPK com
+  // `image_share` no epk.yaml (images/og/_epk.jpg).
   const ogTags = (lingua, pagina, evento) => {
-    const imagem = evento ? String(evento.imagem_v_4x5 ?? '').trim() && evento.slug : imagemPartilha && '_default';
+    const imagem = evento ? String(evento.imagem_v_4x5 ?? '').trim() && evento.slug
+      : pagina === 'epk.html' && epkPartilha ? '_epk' : imagemPartilha && '_default';
     return [
       `<meta property="og:url" content="${url(lingua, pagina)}">`,
       `<meta property="og:locale" content="${LINGUAS[lingua].og}">`,
@@ -503,6 +521,9 @@ async function main() {
       html = substituirMarcador(html, /^[ \t]*<!-- @hero-imagens.*-->/m, heroImagens, pagina);
       html = substituirMarcador(html, /^[ \t]*<!-- @hero-cta.*-->\r?\n?/m, heroCta(lingua), pagina);
       html = substituirMarcador(html, /^([ \t]*)<!-- @agenda -->\r?\n?/m, agendaHtml(lingua), pagina);
+    }
+    if (pagina === 'epk.html') {
+      html = substituirMarcador(html, /^([ \t]*)<!-- @epk-hero -->/m, (_, indent) => epkHero.map((l) => indent + l).join('\n'), pagina);
     }
     if (evento) html = substituirMarcador(html, /^([ \t]*)<!-- @evento -->/m, eventoHtml(evento, lingua), pagina);
     // `<!-- @idioma -->`: link para a mesma página nas outras línguas; `<!-- @hreflang -->`:
@@ -542,6 +563,7 @@ async function main() {
   const ogNovas = (await Promise.all([
     ...eventos.filter((c) => String(c.imagem_v_4x5 ?? '').trim()).map((c) => imagemOg(String(c.imagem_v_4x5).trim(), c.slug)),
     ...(imagemPartilha ? [imagemOg(imagemPartilha, '_default')] : []),
+    ...(epkPartilha ? [imagemOg(epkPartilha, '_epk')] : []),
   ])).filter(Boolean).length;
   await gerarFavicons();
 
