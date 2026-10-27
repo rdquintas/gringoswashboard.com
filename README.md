@@ -12,7 +12,7 @@ src/              ficheiros do site (copiados para dist/ pelo build)
   index.html      página inicial
   css/site.css    estilos próprios do site
   images/         imagens (hero.jpg)
-build.js          build: limpa dist/ e copia src/ para lá
+build.js          build: limpa dist/, copia src/ para lá e gera sitemap.xml e robots.txt
 dist/             resultado do build; versionado, porque é o que o GitHub Pages serve
 netlify.toml      configuração do Netlify (comando, pasta publicada, Node 22, cabeçalhos de segurança)
 ```
