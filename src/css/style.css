@@ -52,6 +52,7 @@ p { margin: 0 0 1em; }
 ul { margin: 0; padding: 0; list-style: none; }
 button { font: inherit; cursor: pointer; }
 .wrap { width: min(var(--wrap), 100% - 40px); margin-inline: auto; }
+[hidden] { display: none !important; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ---------- Header ---------- */
@@ -293,8 +294,24 @@ button { font: inherit; cursor: pointer; }
 .footer-nav ul a:hover { color: var(--white); }
 .footer-nav .social a { color: var(--white); }
 .footer-nav .social a:hover { color: var(--gold); }
-.footer-legal { display: flex; gap: 20px; margin: 14px 0 10px; color: #888; font-size: 14px; }
+.footer-legal { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 14px 0 10px; color: #888; font-size: 14px; }
 .footer-legal a:hover { color: var(--gold); }
+.cookies-gerir { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.cookies-gerir:hover { color: var(--gold); }
+
+/* ---------- Aviso de cookies ---------- */
+/* Criado pelo main.js (só com google_analytics_id no site.yaml); fixo no fundo do ecrã. */
+.cookies {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 90;
+  max-width: 760px; margin-inline: auto; padding: 18px 20px;
+  display: flex; align-items: center; gap: 14px 24px;
+  background: var(--black); color: var(--white); border: 2px solid var(--gold);
+  box-shadow: 0 10px 30px rgba(0,0,0,.4); font-size: 14px;
+}
+.cookies p { margin: 0; flex: 1; }
+.cookies a { color: var(--gold); text-decoration: underline; }
+.cookies-botoes { display: flex; gap: 10px; flex: none; }
+.cookies .btn { width: auto; padding: 10px 22px; font-size: 14px; }
 .copyright { color: #aaa; font-size: 14px; margin: 0; }
 .copyright a { color: var(--white); }
 .copyright a:hover { color: var(--gold); }
@@ -365,6 +382,16 @@ button { font: inherit; cursor: pointer; }
 .evento-dados a { color: var(--black); overflow-wrap: anywhere; }
 .evento-dados a:hover { color: var(--rust); }
 .evento-voltar { margin: 36px 0 0; }
+
+/* ---------- Páginas legais (privacidade, cookies) ---------- */
+.post.legal { margin-top: calc(var(--header-h) + 30px); }
+.post.legal h2 { font-size: 22px; }
+.post.legal ul { list-style: disc; padding-left: 20px; margin: 0 0 1em; }
+.post.legal li { padding: 2px 0; }
+.post.legal a { color: var(--black); text-decoration: underline; }
+.post.legal a:hover { color: var(--rust); }
+.post.legal strong { color: var(--black); }
+.post.legal .btn { text-decoration: none; margin-top: 6px; }
 
 /* ---------- Embed placeholder ---------- */
 .embed { position: relative; aspect-ratio: 16 / 9; background: #111; overflow: hidden; }
@@ -438,6 +465,8 @@ button { font: inherit; cursor: pointer; }
   .post .lead { font-size: 18px; }
   .post.evento .meta { font-size: 19px; flex-direction: column; }
   .hero-cta { flex-direction: column; align-items: center; gap: 10px; }
+  .cookies { flex-direction: column; align-items: stretch; }
+  .cookies-botoes .btn { flex: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

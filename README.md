@@ -36,5 +36,10 @@ npm run dev          # build + serve dist em http://localhost:3000/
 2. Netlify → *Add new site* → *Import from Git* → escolher o repositório. O `netlify.toml` já define o comando (`npm run build`), a pasta (`dist`) e o Node 22.
 3. Configurar o domínio em *Domain management*.
 
+## Google Analytics e cookies
+- O ID do GA4 fica em `src/conteudo/site.yaml` (`google_analytics_id: 'G-…'`). Vazio = sem Google Analytics e sem aviso de cookies.
+- O GA só é carregado depois de o visitante aceitar no aviso de cookies (fundo do ecrã). A escolha fica guardada no browser e pode ser mudada em "Preferências de cookies", no footer ou na página da política de cookies.
+- Páginas legais: `src/privacidade.html` e `src/politica-cookies.html` (pt e en). Ao mudar o que o site recolhe (ex.: newsletter real, novos serviços externos), rever o texto e a data de atualização.
+
 ## Notas
 - Segurança: cabeçalhos e CSP no `netlify.toml`. A CSP só permite recursos do próprio domínio e **não permite scripts nem estilos inline**: quando se acrescentar CSS/JS, vai em ficheiros. Qualquer domínio externo novo tem de ser acrescentado à CSP.

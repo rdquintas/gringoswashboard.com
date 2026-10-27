@@ -1,7 +1,7 @@
 // Build: copia src/ para dist/ (limpa dist/ antes) e gera cada página numa versão por língua
 // (pt em dist/, en em dist/en/), escolhendo os blocos {{#lang xx}}…{{/lang}}. Inclui os partials
 // (header, footer), aplica as configurações de src/conteudo/home.yaml (hero) e site.yaml (redes
-// sociais, contactos), converte as imagens para AVIF e WebP (com <picture> e fallback para o
+// sociais, contactos, Google Analytics), converte as imagens para AVIF e WebP (com <picture> e fallback para o
 // original) e gera sitemap.xml e robots.txt.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -448,6 +448,12 @@ async function main() {
   const botaoWhatsapp = (lingua) => (_, indent) => whatsapp
     ? `${indent}<a class="contact-whatsapp fx-tada" href="https://wa.me/${whatsapp}" target="_blank" rel="noopener"><img src="images/whatsapp.png" alt="${ROTULOS[lingua].whatsapp}" width="300" height="300" loading="lazy"></a>\n`
     : '';
+  // Google Analytics (`google_analytics_id` do site.yaml): `<!-- @analytics -->` (no <head>) dá
+  // lugar a <meta name="ga-id">; o main.js só carrega o GA depois de o visitante aceitar os
+  // cookies. Vazio: tira a linha (sem GA nem aviso de cookies).
+  const gaId = String(site.google_analytics_id ?? '').trim();
+  if (gaId && !/^G-[A-Z0-9]+$/.test(gaId)) throw new Error(`site.yaml: \`google_analytics_id\` tem de ser um ID do GA4 (G-XXXXXXXXXX): ${gaId}`);
+  const metaAnalytics = (_, indent) => (gaId ? `${indent}<meta name="ga-id" content="${gaId}">\n` : '');
 
   // Cache busting: os links para css/style.css e js/main.js levam `?v=<hash do conteúdo>`, para
   // os browsers não usarem uma versão antiga em cache depois de um deploy.
@@ -510,6 +516,7 @@ async function main() {
     html = html
       .replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, listaIcones(social, 'social'))
       .replace(/^([ \t]*)<!-- @hreflang -->/gm, (_, indent) => hreflang(indent))
+      .replace(/^([ \t]*)<!-- @analytics -->\r?\n?/gm, metaAnalytics)
       .replace(/^([ \t]*)<!-- @og -->/gm, (_, indent) => ogTags(lingua, pagina, evento).map((l) => indent + l).join('\n'))
       .replace(/<!-- @idioma -->/g, idioma)
       .replace(/<!-- @email -->/g, linkEmail)

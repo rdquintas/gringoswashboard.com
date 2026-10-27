@@ -203,6 +203,85 @@
     });
   });
 
+  /* ---------- Cookies + Google Analytics ---------- */
+  // O build põe o ID do GA (site.yaml) em <meta name="ga-id">; sem ele não há GA nem aviso.
+  // O GA só é carregado depois de o visitante aceitar; a escolha fica no localStorage e pode ser
+  // mudada no botão "Preferências de cookies" (footer) ou em [data-cookies] na política de cookies.
+  var gaMeta = document.querySelector('meta[name="ga-id"]');
+  var gaId = gaMeta && gaMeta.content;
+  var CONSENTIMENTO = "cookies-consentimento";
+  function lerConsentimento() {
+    try { return localStorage.getItem(CONSENTIMENTO); } catch (e) { return null; }
+  }
+  function guardarConsentimento(valor) {
+    try { localStorage.setItem(CONSENTIMENTO, valor); } catch (e) { /* sem storage: pergunta outra vez na próxima página */ }
+  }
+  var gaCarregado = false;
+  function carregarAnalytics() {
+    window["ga-disable-" + gaId] = false;
+    if (gaCarregado) return;
+    gaCarregado = true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date());
+    window.gtag("config", gaId);
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(gaId);
+    document.head.appendChild(s);
+  }
+  // Ao recusar depois de ter aceitado: desliga o GA e apaga os cookies dele (_ga, _ga_*)
+  function desligarAnalytics() {
+    window["ga-disable-" + gaId] = true;
+    var partes = location.hostname.split(".");
+    document.cookie.split(";").forEach(function (c) {
+      var nome = c.split("=")[0].trim();
+      if (!/^_ga(_|$)/.test(nome)) return;
+      for (var i = 0; i < partes.length; i++) {
+        var dominio = partes.slice(i).join(".");
+        document.cookie = nome + "=; Max-Age=0; path=/; domain=" + dominio;
+      }
+      document.cookie = nome + "=; Max-Age=0; path=/";
+    });
+  }
+
+  if (gaId) {
+    var aviso = document.createElement("div");
+    aviso.className = "cookies";
+    aviso.setAttribute("role", "region");
+    aviso.setAttribute("aria-label", t("Aviso de cookies", "Cookie notice"));
+    aviso.hidden = true;
+    aviso.innerHTML =
+      '<p>' + t(
+        'Usamos cookies do Google Analytics para perceber como o site é usado. Só os ativamos se aceitares. <a href="politica-cookies.html">Política de cookies</a>',
+        'We use Google Analytics cookies to understand how the site is used. We only turn them on if you accept. <a href="politica-cookies.html">Cookie policy</a>'
+      ) + '</p>' +
+      '<div class="cookies-botoes">' +
+      '<button class="btn btn--black" type="button" data-escolha="recusado">' + t("Recusar", "Decline") + '</button>' +
+      '<button class="btn btn--gold" type="button" data-escolha="aceite">' + t("Aceitar", "Accept") + '</button>' +
+      '</div>';
+    document.body.appendChild(aviso);
+    aviso.querySelectorAll("[data-escolha]").forEach(function (botao) {
+      botao.addEventListener("click", function () {
+        var escolha = botao.dataset.escolha;
+        guardarConsentimento(escolha);
+        if (escolha === "aceite") carregarAnalytics(); else desligarAnalytics();
+        aviso.hidden = true;
+      });
+    });
+    document.querySelectorAll("[data-cookies]").forEach(function (botao) {
+      botao.hidden = false;
+      botao.addEventListener("click", function () {
+        aviso.hidden = false;
+        aviso.querySelector('[data-escolha="aceite"]').focus();
+      });
+    });
+
+    var consentimento = lerConsentimento();
+    if (consentimento === "aceite") carregarAnalytics();
+    else if (consentimento !== "recusado") aviso.hidden = false;
+  }
+
   /* ---------- Footer year ---------- */
   document.querySelectorAll("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 })();
