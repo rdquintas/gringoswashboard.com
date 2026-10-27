@@ -172,6 +172,35 @@
     img.style.setProperty("--rot", r + "deg");
   });
 
+  /* ---------- Lightbox: a capa clicada abre em tamanho total; Esc ou clique fora fecha ---------- */
+  var coverLinks = document.querySelectorAll(".covers-big a, .covers-grid a");
+  if (coverLinks.length && window.HTMLDialogElement) {
+    var box = document.createElement("dialog");
+    box.className = "lightbox";
+    var boxImg = document.createElement("img");
+    var boxClose = document.createElement("button");
+    boxClose.type = "button";
+    boxClose.className = "lightbox-close";
+    boxClose.setAttribute("aria-label", t("Fechar", "Close"));
+    boxClose.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+    box.append(boxImg, boxClose);
+    document.body.appendChild(box);
+
+    coverLinks.forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        var img = link.querySelector("img");
+        boxImg.src = link.href;
+        boxImg.alt = img ? img.alt : "";
+        box.showModal();
+      });
+    });
+    boxClose.addEventListener("click", function () { box.close(); });
+    // Um clique no próprio <dialog> (e não na imagem) é um clique no fundo
+    box.addEventListener("click", function (e) { if (e.target === box) box.close(); });
+    box.addEventListener("close", function () { boxImg.removeAttribute("src"); });
+  }
+
   /* ---------- YouTube: swap the thumbnail for the player on click ---------- */
   function youtubePlayer(id, title) {
     var iframe = document.createElement("iframe");

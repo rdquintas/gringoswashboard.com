@@ -21,7 +21,8 @@ const LINGUAS = {
   pt: { pasta: '', codigo: 'pt-PT', nome: 'Português', bandeira: 'flag-pt.svg' },
   en: { pasta: 'en/', codigo: 'en', nome: 'English', bandeira: 'flag-uk.svg' },
 };
-// Redes sociais aceites em `links` do site.yaml: nome (aria-label) e ícone do Font Awesome.
+// Redes aceites em `links` (redes sociais) do site.yaml: nome (aria-label) e ícone do Font
+// Awesome.
 const REDES = {
   facebook: ['Facebook', 'fa-facebook'],
   instagram: ['Instagram', 'fa-instagram'],
@@ -232,16 +233,19 @@ async function main() {
   const css = path.join(DIST, 'css', 'style.css');
   fs.writeFileSync(css, substituirMarcador(fs.readFileSync(css, 'utf8'), /\/\* @hero-animacao \*\//, cssHero, 'css/style.css'));
 
-  // Redes sociais (`links` do site.yaml): cada `<!-- @social -->` dos partials dá lugar à
-  // lista de ícones, pela ordem do YAML, abertos noutra janela. Uma rede com link vazio não
-  // é colocada; sem nenhuma, a lista também não.
-  const social = Object.entries(site.links ?? {})
+  // Ícones das redes (`links` do site.yaml): cada `<!-- @social -->` (partials) dá lugar à
+  // lista de ícones, pela ordem do YAML, abertos noutra janela. Uma rede com link vazio não é
+  // colocada; sem nenhuma, a lista também não.
+  const icones = (chave) => Object.entries(site[chave] ?? {})
     .filter(([, link]) => String(link ?? '').trim() !== '')
     .map(([rede, link]) => {
-      if (!REDES[rede]) throw new Error(`site.yaml: rede social desconhecida em \`links\`: ${rede} (conhecidas: ${Object.keys(REDES).join(', ')})`);
+      if (!REDES[rede]) throw new Error(`site.yaml: rede desconhecida em \`${chave}\`: ${rede} (conhecidas: ${Object.keys(REDES).join(', ')})`);
       const [nome, icone] = REDES[rede];
       return `<li><a class="fx-tada" href="${escapar(link)}" target="_blank" rel="noopener" aria-label="${nome}"><i class="fa-brands ${icone}"></i></a></li>`;
     });
+  const listaIcones = (itens, classe) => (_, indent) =>
+    itens.length ? [`${indent}<ul class="${classe}">`, ...itens.map((li) => `${indent}  ${li}`), `${indent}</ul>`].join('\n') + '\n' : '';
+  const social = icones('links');
   // Contactos do site.yaml: cada `<!-- @email -->` dá lugar ao link mailto de `contactos.email`
   // e cada `<!-- @telefone -->` ao link tel de `contactos.telefone` (sem espaços no href).
   const email = String(site.contactos?.email ?? '').trim();
@@ -275,8 +279,7 @@ async function main() {
         `<link rel="alternate" hreflang="x-default" href="${url(Object.keys(LINGUAS)[0], pagina)}">`,
       ].map((l) => indent + l).join('\n');
       html = html
-        .replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, (_, indent) =>
-          social.length ? [`${indent}<ul class="social">`, ...social.map((li) => `${indent}  ${li}`), `${indent}</ul>`].join('\n') + '\n' : '')
+        .replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, listaIcones(social, 'social'))
         .replace(/^([ \t]*)<!-- @hreflang -->/gm, (_, indent) => hreflang(indent))
         .replace(/<!-- @idioma -->/g, idioma)
         .replace(/<!-- @email -->/g, linkEmail)
