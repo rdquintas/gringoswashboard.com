@@ -152,16 +152,20 @@ button { font: inherit; cursor: pointer; }
   position: relative; background: #1b1310;
   height: min(78vh, 760px); min-height: 360px; overflow: hidden;
 }
-/* Slideshow do hero: imagens empilhadas em crossfade. A animação (duração, delays e keyframes)
-   é gerada pelo build a partir de conteudo/home.yaml (hero, duracao_hero) e entra no marcador abaixo. */
-.hero img {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  opacity: 0;
+/* Slideshow do hero: slides empilhados em crossfade. A animação (duração, delays e keyframes)
+   é gerada pelo build a partir de conteudo/home.yaml (hero, duracao_hero) e entra no marcador abaixo.
+   Cada slide tem a imagem horizontal (.hero-h) e a vertical (.hero-v), esta só em ecrãs na vertical. */
+.hero-slide { position: absolute; inset: 0; opacity: 0; }
+.hero-slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-v { display: none; }
+@media (orientation: portrait) {
+  .hero-h { display: none; }
+  .hero-v { display: block; }
 }
 /* @hero-animacao */
 @media (prefers-reduced-motion: reduce) {
-  .hero img { animation: none; }
-  .hero picture:first-of-type img { opacity: 1; }
+  .hero-slide { animation: none; }
+  .hero-slide:first-child { opacity: 1; }
 }
 .hero-title {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);

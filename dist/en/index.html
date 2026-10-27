@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Catamaran:wght@400;700&family=Oswald:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../css/style.css?v=46dc0d338f">
+  <link rel="stylesheet" href="../css/style.css?v=7558d9b4b5">
 </head>
 <body>
 
@@ -75,9 +75,18 @@
   <main>
     <!-- ===== Hero ===== -->
     <section class="hero" aria-label="Gringo's Washboard Band live">
-      <picture><source srcset="../images/hero01.avif" type="image/avif"><source srcset="../images/hero01.webp" type="image/webp"><img src="../images/hero01.png" alt="" width="1920" height="900"></picture>
-      <picture><source srcset="../images/hero02.avif" type="image/avif"><source srcset="../images/hero02.webp" type="image/webp"><img src="../images/hero02.png" alt="" width="1920" height="900"></picture>
-      <picture><source srcset="../images/hero03.avif" type="image/avif"><source srcset="../images/hero03.webp" type="image/webp"><img src="../images/hero03.png" alt="" width="1920" height="900"></picture>
+      <div class="hero-slide">
+        <picture><source srcset="../images/hero01.avif" type="image/avif"><source srcset="../images/hero01.webp" type="image/webp"><img class="hero-h" src="../images/hero01.png" alt="" width="1920" height="900" loading="lazy"></picture>
+        <picture><source srcset="../images/hero01_v.avif" type="image/avif"><source srcset="../images/hero01_v.webp" type="image/webp"><img class="hero-v" src="../images/hero01_v.png" alt="" width="1080" height="1920" loading="lazy"></picture>
+      </div>
+      <div class="hero-slide">
+        <picture><source srcset="../images/hero02.avif" type="image/avif"><source srcset="../images/hero02.webp" type="image/webp"><img class="hero-h" src="../images/hero02.png" alt="" width="1920" height="900" loading="lazy"></picture>
+        <picture><source srcset="../images/hero02_v.avif" type="image/avif"><source srcset="../images/hero02_v.webp" type="image/webp"><img class="hero-v" src="../images/hero02_v.png" alt="" width="1080" height="1920" loading="lazy"></picture>
+      </div>
+      <div class="hero-slide">
+        <picture><source srcset="../images/hero03.avif" type="image/avif"><source srcset="../images/hero03.webp" type="image/webp"><img class="hero-h" src="../images/hero03.png" alt="" width="1920" height="900" loading="lazy"></picture>
+        <picture><source srcset="../images/hero03_v.avif" type="image/avif"><source srcset="../images/hero03_v.webp" type="image/webp"><img class="hero-v" src="../images/hero03_v.png" alt="" width="1080" height="1920" loading="lazy"></picture>
+      </div>
       <h1 class="hero-title">Gringo's Washboard Band</h1>
       <div class="hero-cta">
         <a class="btn btn--gold" href="#book">Book the Band</a>

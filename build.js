@@ -193,11 +193,20 @@ async function main() {
   const { hero, duracao_hero: duracao } = config.section_hero ?? {};
   if (!Array.isArray(hero) || hero.length === 0) throw new Error('home.yaml: `section_hero.hero` tem de ser uma lista de imagens');
   if (typeof duracao !== 'number' || duracao <= HERO_FADE) throw new Error(`home.yaml: \`section_hero.duracao_hero\` tem de ser um número maior que ${HERO_FADE}`);
-  hero.forEach((img) => {
+  hero.forEach((item, k) => ['horizontal', 'vertical'].forEach((formato) => {
+    const img = item?.[formato];
+    if (typeof img !== 'string' || !img) throw new Error(`home.yaml: \`section_hero.hero\` (imagem ${k + 1}) tem de ter \`${formato}\``);
     if (!fs.existsSync(path.join(SRC, 'images', img))) throw new Error(`home.yaml: imagem do hero não existe: images/${img}`);
     if (!IMG_CONVERTIVEIS.test(img)) throw new Error(`home.yaml: imagem do hero tem de ser PNG ou JPG: ${img}`);
-  });
-  const heroImagens = hero.map((img) => `      <img src="images/${img}" alt="" width="1920" height="900">`).join('\n');
+  }));
+  // Cada imagem é um .hero-slide com as duas versões; o CSS mostra só uma, conforme a orientação
+  // do ecrã. `loading="lazy"` para o browser não descarregar a versão escondida (display: none).
+  const heroImagens = hero.map(({ horizontal, vertical }) => [
+    '      <div class="hero-slide">',
+    `        <img class="hero-h" src="images/${horizontal}" alt="" width="1920" height="900" loading="lazy">`,
+    `        <img class="hero-v" src="images/${vertical}" alt="" width="1080" height="1920" loading="lazy">`,
+    '      </div>',
+  ].join('\n')).join('\n');
 
   // Botões do hero a partir de `cta1` (dourado) e `cta2` (preto), com o texto na língua da
   // página (`pt`, `en`). Um CTA sem `link` não é colocado; sem nenhum, não fica o contentor .hero-cta.
@@ -214,15 +223,15 @@ async function main() {
 
   // Cada imagem fica `duracao` s visível; o ciclo é n × duracao. A imagem k começa a aparecer
   // em k × duracao − fade, para a primeira já estar visível ao carregar a página.
-  // As imagens do hero ficam dentro de <picture> (ver usarPicture), daí o `picture:nth-of-type`.
+  // A animação é aplicada ao .hero-slide (os primeiros filhos da .hero, daí o `nth-child`).
   const ciclo = hero.length * duracao;
   const pct = (s) => `${+(s / ciclo * 100).toFixed(2)}%`;
   const s = (v) => `${+v.toFixed(2)}s`;
   const cssHero = hero.length === 1
-    ? '.hero img { opacity: 1; }'
+    ? '.hero-slide { opacity: 1; }'
     : [
-      `.hero img { animation: hero-fade ${s(ciclo)} infinite; }`,
-      ...hero.map((_, k) => `.hero picture:nth-of-type(${k + 1}) img { animation-delay: -${s((ciclo - k * duracao + HERO_FADE) % ciclo)}; }`),
+      `.hero-slide { animation: hero-fade ${s(ciclo)} infinite; }`,
+      ...hero.map((_, k) => `.hero-slide:nth-child(${k + 1}) { animation-delay: -${s((ciclo - k * duracao + HERO_FADE) % ciclo)}; }`),
       '@keyframes hero-fade {',
       `  0% { opacity: 0; }`,
       `  ${pct(HERO_FADE)} { opacity: 1; }`,

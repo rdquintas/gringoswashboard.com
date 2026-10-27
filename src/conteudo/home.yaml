@@ -2,11 +2,15 @@
 
 # Secção hero (slideshow no topo da página)
 section_hero:
-  # Imagens do slideshow (ficheiros em src/images/), pela ordem em que aparecem
+  # Imagens do slideshow (ficheiros em src/images/), pela ordem em que aparecem. Cada uma tem
+  # uma versão horizontal (desktop, 1920×900) e uma vertical (telemóvel na vertical, 1080×1920).
   hero:
-    - hero01.png
-    - hero02.png
-    - hero03.png
+    - horizontal: hero01.png
+      vertical: hero01_v.png
+    - horizontal: hero02.png
+      vertical: hero02_v.png
+    - horizontal: hero03.png
+      vertical: hero03_v.png
   
   cta1:
     pt: "Contratar a Banda"
