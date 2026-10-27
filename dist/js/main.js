@@ -126,9 +126,12 @@
     box.append(boxImg, boxClose);
     document.body.appendChild(box);
 
+    // Capa aberta com o rato: ao fechar, o foco que o <dialog> lhe devolve sai (sem contorno)
+    var openedByMouse = null;
     coverLinks.forEach(function (link) {
       link.addEventListener("click", function (e) {
         e.preventDefault();
+        openedByMouse = e.detail > 0 ? link : null;
         var img = link.querySelector("img");
         boxImg.src = link.href;
         boxImg.alt = img ? img.alt : "";
@@ -138,7 +141,10 @@
     boxClose.addEventListener("click", function () { box.close(); });
     // Um clique no próprio <dialog> (e não na imagem) é um clique no fundo
     box.addEventListener("click", function (e) { if (e.target === box) box.close(); });
-    box.addEventListener("close", function () { boxImg.removeAttribute("src"); });
+    box.addEventListener("close", function () {
+      boxImg.removeAttribute("src");
+      if (openedByMouse) openedByMouse.blur();
+    });
   }
 
   /* ---------- YouTube: swap the thumbnail for the player on click ---------- */

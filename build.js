@@ -41,8 +41,8 @@ const DATAS = {
 };
 // Textos da agenda e das páginas dos concertos gerados pelo build, por língua.
 const ROTULOS = {
-  pt: { bilhetes: 'Bilhetes', info: 'Informações', comprar: 'Comprar bilhetes', local: 'Local', mapa: 'Ver no mapa', voltar: 'Voltar à agenda', whatsapp: 'Conversar no WhatsApp' },
-  en: { bilhetes: 'Tickets', info: 'Info', comprar: 'Buy tickets', local: 'Venue', mapa: 'View on map', voltar: 'Back to tour dates', whatsapp: 'Chat on WhatsApp' },
+  pt: { bilhetes: 'Bilhetes', info: 'Informações', comprar: 'Comprar bilhetes', local: 'Local', mapa: 'Ver no mapa', voltar: 'Voltar à agenda', whatsapp: 'Conversar no WhatsApp', video: 'Ver vídeo no YouTube', imagemVideo: 'Imagem do vídeo' },
+  en: { bilhetes: 'Tickets', info: 'Info', comprar: 'Buy tickets', local: 'Venue', mapa: 'View on map', voltar: 'Back to tour dates', whatsapp: 'Chat on WhatsApp', video: 'Watch on YouTube', imagemVideo: 'Video still' },
 };
 // Imagem de partilha (og:image) dos concertos: JPG com estas medidas, a partir de `imagem_v_4x5`.
 const OG = { largura: 1440, altura: 1800, qualidade: 85 };
@@ -73,6 +73,8 @@ const FORMATOS = [
 // aninhados por indentação com espaços. Uma `chave:` sem valor abre um mapa ou uma lista,
 // consoante a primeira linha mais indentada que se lhe segue. Um item `- chave: valor` abre
 // um mapa, cujas restantes chaves vêm nas linhas seguintes, alinhadas com a primeira.
+// `chave: |` (ou `|-`, sem a quebra de linha final) abre um bloco de texto com as linhas
+// seguintes mais indentadas que a chave, tal como estão (sem comentários: `#` fica no texto).
 function lerYaml(ficheiro) {
   const dados = {};
   const CHAVE = /^([\w-]+):(?:\s+(.*))?$/;
@@ -83,17 +85,33 @@ function lerYaml(ficheiro) {
   const escalar = (v) => {
     v = v.trim();
     const aspas = v.match(/^(['"])(.*)\1$/);
-    if (aspas) return aspas[2];
+    // Entre plicas, `''` é uma plica (como no YAML).
+    if (aspas) return aspas[1] === "'" ? aspas[2].replace(/''/g, "'") : aspas[2];
     return v !== '' && !isNaN(v) ? Number(v) : v;
   };
+  // Bloco de texto aberto (`chave: |`), com as linhas lidas até agora.
+  let bloco = null;
+  const fecharBloco = () => {
+    const linhas = bloco.linhas.join('\n').replace(/\n+$/, '').split('\n');
+    const margem = Math.min(...linhas.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length));
+    const texto = linhas.map((l) => l.slice(margem)).join('\n');
+    bloco.mapa[bloco.chave] = bloco.final && texto ? texto + '\n' : texto;
+    bloco = null;
+  };
   const definir = (mapa, [, chave, valor = ''], indent) => {
-    if (valor.trim() !== '') mapa[chave] = escalar(valor);
+    const marca = valor.trim().match(/^\|(-?)$/);
+    if (marca) bloco = { mapa, chave, indent, final: !marca[1], linhas: [] };
+    else if (valor.trim() !== '') mapa[chave] = escalar(valor);
     else {
       mapa[chave] = null;
       pilha.push({ indent, pai: mapa, chave, valor: null });
     }
   };
   fs.readFileSync(ficheiro, 'utf8').split(/\r?\n/).forEach((linha, i) => {
+    if (bloco) {
+      if (!linha.trim() || linha.match(/^ */)[0].length > bloco.indent) return bloco.linhas.push(linha.trimEnd());
+      fecharBloco();
+    }
     const texto = linha.replace(/\s+#.*$/, '').replace(/^\s*#.*$/, '').trimEnd();
     if (!texto) return;
     const erro = () => new Error(`${path.basename(ficheiro)}:${i + 1}: linha não suportada: ${linha}`);
@@ -117,6 +135,7 @@ function lerYaml(ficheiro) {
       definir(topo.valor, m, indent);
     } else throw erro();
   });
+  if (bloco) fecharBloco();
   return dados;
 }
 
@@ -253,6 +272,110 @@ function usarPicture(html) {
   });
 }
 
+const escapar = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+// Markdown mínimo (sem dependências) para textos do YAML. Blocos separados por linhas em branco:
+// `## Título` (h2; `###` h3, …, com .section-title), parágrafos, `> citação` (.pullquote),
+// listas (`- item`), uma imagem sozinha (`![alt](band.jpg)`, ficheiro em images/) e HTML
+// (bloco começado por `<`, fica igual). `{.classe …}` no fim de um bloco junta-lhe classes.
+// `::: split` … `:::` põe os blocos lado a lado (.about-split): o texto numa coluna e a imagem
+// na outra, pela ordem em que estão (imagem primeiro → .about-split--left).
+// No texto: **negrito**, *itálico* (ou _itálico_), [link](url) (externo abre noutra janela) e
+// HTML. Cada bloco do primeiro nível (e cada coluna) leva .reveal. Devolve as linhas do HTML.
+function markdown(texto, onde) {
+  const erro = (msg) => new Error(`${onde}: ${msg}`);
+  const IMAGEM = /!\[([^\]]*)\]\(([^)\s]+)\)/;
+  const caminhoImagem = (src) => {
+    if (/^[a-z]+:|\//i.test(src)) return src;
+    if (!fs.existsSync(path.join(SRC, 'images', src))) throw erro(`imagem não existe: images/${src}`);
+    return `images/${src}`;
+  };
+  const imagem = (alt, src, classe = '') =>
+    `<img${classe ? ` class="${classe}"` : ''} src="${escapar(caminhoImagem(src))}" alt="${escapar(alt)}" loading="lazy">`;
+  // Imagens e links ficam de parte (\0n\0) enquanto se trata o negrito/itálico, para não mexer nos URLs.
+  const emLinha = (t) => {
+    const guardados = [];
+    const guardar = (html) => `\0${guardados.push(html) - 1}\0`;
+    const enfase = (s) => s
+      .replace(/\*\*(?!\s)(.+?)(?<!\s)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(?!\s)(.+?)(?<!\s)\*/g, '<em>$1</em>')
+      .replace(/(^|[^\w])_(?!\s)(.+?)(?<!\s)_(?!\w)/g, '$1<em>$2</em>');
+    return enfase(t
+      .replace(new RegExp(IMAGEM.source, 'g'), (_, alt, src) => guardar(imagem(alt, src)))
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, txt, href) => guardar(`<a href="${escapar(href)}"${
+        /^https?:/.test(href) ? ' target="_blank" rel="noopener"' : ''}>${enfase(txt)}</a>`)))
+      .replace(/\0(\d+)\0/g, (_, n) => guardados[n]);
+  };
+
+  // Blocos (listas de linhas); um título é sempre um bloco sozinho.
+  const blocos = [];
+  let atual = null;
+  let caixa = null;
+  texto.split(/\r?\n/).forEach((linha) => {
+    const l = linha.trim();
+    const abre = l.match(/^:::\s*(\S+)$/);
+    if (abre || l === ':::') {
+      atual = null;
+      if (abre && caixa) throw erro('`:::` não se aninham');
+      if (abre && abre[1] !== 'split') throw erro(`caixa desconhecida: ::: ${abre[1]} (conhecidas: split)`);
+      if (!abre && !caixa) throw erro('`:::` a fechar sem nenhuma aberta');
+      if (abre) caixa = { blocos: [] };
+      else blocos.push(caixa), caixa = null;
+      return;
+    }
+    if (!l) return (atual = null);
+    const destino = caixa ? caixa.blocos : blocos;
+    if (/^#+\s/.test(l)) return destino.push([l]), (atual = null);
+    if (!atual) destino.push((atual = []));
+    atual.push(l);
+  });
+  if (caixa) throw erro('falta `:::` a fechar o `::: split`');
+
+  // Um bloco → [tipo, html]; `reveal` acrescenta essa classe.
+  const bloco = (linhas, reveal) => {
+    const atributos = linhas.at(-1).match(/\s*\{((?:\s*\.[\w-]+)+)\s*\}$/);
+    if (atributos) linhas = [...linhas.slice(0, -1), linhas.at(-1).slice(0, atributos.index)].filter(Boolean);
+    const classes = (base) => {
+      const todas = [...base, ...(atributos ? atributos[1].trim().split(/\s+/).map((c) => c.slice(1)) : []), ...(reveal ? ['reveal'] : [])];
+      return todas.length ? ` class="${todas.join(' ')}"` : '';
+    };
+    const juntar = (ls) => emLinha(ls.join(' '));
+    const titulo = linhas[0].match(/^(#+)\s+(.*)$/);
+    if (titulo) {
+      if (titulo[1].length < 2 || titulo[1].length > 6) throw erro(`título com ${titulo[1].length} # (usar ## a ######; o h1 é o do hero): ${linhas[0]}`);
+      return ['texto', `<h${titulo[1].length}${classes(['section-title'])}>${emLinha(titulo[2])}</h${titulo[1].length}>`];
+    }
+    const img = linhas.length === 1 && linhas[0].match(new RegExp(`^${IMAGEM.source}$`));
+    if (img) return ['imagem', imagem(img[1], img[2], classes([]).replace(/^ class="|"$/g, ''))];
+    if (linhas[0].startsWith('<')) return ['texto', linhas.join('\n')];
+    if (linhas.every((l) => /^>/.test(l))) return ['texto', `<p${classes(['pullquote'])}>${juntar(linhas.map((l) => l.replace(/^>\s?/, '')))}</p>`];
+    if (linhas.every((l) => /^[-*]\s/.test(l))) {
+      return ['texto', [`<ul${classes([])}>`, ...linhas.map((l) => `  <li>${emLinha(l.slice(2).trim())}</li>`), '</ul>'].join('\n')];
+    }
+    return ['texto', `<p${classes([])}>${juntar(linhas)}</p>`];
+  };
+  const indentar = (html) => html.split('\n').map((l) => '  ' + l);
+
+  return blocos.flatMap((b) => {
+    if (Array.isArray(b)) return bloco(b, true)[1].split('\n');
+    // ::: split — o texto seguido fica numa coluna (div.reveal); cada imagem é outra coluna.
+    const colunas = [];
+    b.blocos.forEach((linhas) => {
+      const [tipo, html] = bloco(linhas, false);
+      if (tipo === 'imagem') colunas.push(['imagem', html.replace(/^<img(?: class="([^"]*)")?/, (_, c) => `<img class="${c ? c + ' ' : ''}reveal"`)]);
+      else if (colunas.at(-1)?.[0] === 'texto') colunas.at(-1)[1].push(html);
+      else colunas.push(['texto', [html]]);
+    });
+    if (!colunas.length) throw erro('`::: split` vazio');
+    return [
+      `<div class="about-split${colunas[0][0] === 'imagem' ? ' about-split--left' : ''}">`,
+      ...colunas.flatMap(([tipo, html]) => (tipo === 'imagem' ? indentar(html)
+        : ['  <div class="reveal">', ...html.flatMap((h) => indentar(h).map((l) => '  ' + l)), '  </div>'])),
+      '</div>',
+    ];
+  });
+}
+
 // Cores das paletas: [r, g, b] de 0 a 255.
 const BRANCO = [255, 255, 255];
 const PRETO = [0, 0, 0];
@@ -384,7 +507,6 @@ function gerarPaletas() {
 async function main() {
   const config = lerYaml(path.join(CONTEUDO, 'home.yaml'));
   const site = lerYaml(path.join(CONTEUDO, 'site.yaml'));
-  const escapar = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
   // As páginas (.html na raiz de src/) são geradas abaixo, uma vez por língua; o resto é copiado.
   const paginas = fs.readdirSync(SRC).filter((f) => f.endsWith('.html'))
@@ -427,6 +549,83 @@ async function main() {
       });
     return ctas.length ? `      <div class="hero-cta">\n${ctas.join('\n')}\n      </div>\n` : '';
   };
+
+  // Secção "sobre" (`section_about`): o `texto_<língua>`, em Markdown, no lugar de `<!-- @about -->`.
+  const sobre = Object.fromEntries(Object.keys(LINGUAS).map((lingua) => {
+    const onde = `home.yaml: \`section_about.texto_${lingua}\``;
+    const texto = String(config.section_about?.[`texto_${lingua}`] ?? '').trim();
+    if (!texto) throw new Error(`${onde} tem de ter o texto da secção`);
+    return [lingua, markdown(texto, onde)];
+  }));
+
+  const idYoutube = (link, onde) => {
+    const id = link.match(/(?:[?&]v=|youtu\.be\/|\/(?:embed|shorts|live)\/)([\w-]{11})/)?.[1];
+    if (!id) throw new Error(`home.yaml: \`${onde}\` não é um link do YouTube: ${link}`);
+    return id;
+  };
+
+  // Vídeo em destaque (`section_single_video`), no lugar de `<!-- @video-destaque -->`: o embed
+  // (.embed#live-video) com o `youtube` e, ao lado, o `title_<língua>` (h3) e o `text_<língua>`
+  // (um <p> por parágrafo). Título ou texto vazio não é colocado (nem o .feature-text sem nenhum).
+  const destaque = config.section_single_video ?? {};
+  const destaqueLink = String(destaque.youtube ?? '').trim();
+  if (!destaqueLink) throw new Error('home.yaml: `section_single_video.youtube` tem de ter o link do vídeo');
+  const destaqueId = idYoutube(destaqueLink, 'section_single_video.youtube');
+  const destaqueHtml = (lingua, indent) => {
+    const r = ROTULOS[lingua];
+    const titulo = String(destaque[`title_${lingua}`] ?? '').trim();
+    const nome = titulo || "Gringo's Washboard Band";
+    const paragrafos = String(destaque[`text_${lingua}`] ?? '').split(/\n\s*\n/)
+      .map((p) => p.trim().replace(/\s*\n\s*/g, ' ')).filter(Boolean);
+    const texto = titulo || paragrafos.length ? [
+      `<div class="feature-text reveal">`,
+      ...(titulo ? [`  <h3>${escapar(titulo)}</h3>`] : []),
+      ...paragrafos.map((p) => `  <p>${escapar(p)}</p>`),
+      `</div>`,
+    ] : [];
+    return [
+      `<div class="embed feature-media reveal" id="live-video" data-youtube="${destaqueId}" data-title="${escapar(nome)}">`,
+      `  <img src="https://i.ytimg.com/vi/${destaqueId}/maxresdefault.jpg" alt="${r.imagemVideo}: ${escapar(nome)}" loading="lazy">`,
+      `  <div class="embed-bar"><span class="dot"></span>${escapar(nome)}</div>`,
+      `  <button class="embed-play" type="button" aria-label="${r.video}: ${escapar(nome)}"><i class="fa-solid fa-play"></i></button>`,
+      `</div>`,
+      ...texto,
+    ].map((l) => indent + l).join('\n');
+  };
+
+  // Vídeos da secção Média (`section_media`): um a.video-thumb por cada `youtube_1`/`youtube_2`
+  // com link, no lugar de `<!-- @videos -->`; sem nenhum, não fica o contentor .video-grid.
+  // Só com um, o contentor leva .video-grid--single (centrado e maior).
+  const videos = ['youtube_1', 'youtube_2'].map((chave) => {
+    const link = String(config.section_media?.[chave] ?? '').trim();
+    return link ? { link, id: idYoutube(link, `section_media.${chave}`) } : null;
+  }).filter(Boolean);
+  const videosHtml = (lingua, indent) => {
+    if (!videos.length) return '';
+    const r = ROTULOS[lingua];
+    const nome = "Gringo's Washboard Band";
+    return [
+      `${indent}<div class="video-grid${videos.length === 1 ? ' video-grid--single' : ''} reveal">`,
+      ...videos.map(({ link, id }) =>
+        `${indent}  <a class="video-thumb" href="${escapar(link)}" data-youtube="${id}" target="_blank" rel="noopener" aria-label="${r.video}: ${escapar(nome)}"><img src="https://i.ytimg.com/vi/${id}/maxresdefault.jpg" alt="${r.imagemVideo}: ${escapar(nome)}" loading="lazy"></a>`),
+      `${indent}</div>`,
+    ].join('\n') + '\n';
+  };
+
+  // Fotos da secção Média (`section_media.fotos`, ficheiros em images/), no lugar de
+  // `<!-- @fotos -->`: as duas primeiras em destaque (.covers-big), as outras em .covers-grid.
+  // Um contentor sem fotos não é colocado.
+  const fotos = (config.section_media?.fotos ?? []).map((f) => String(f ?? '').trim()).filter(Boolean);
+  fotos.forEach((f) => {
+    if (!fs.existsSync(path.join(SRC, 'images', f))) throw new Error(`home.yaml: \`section_media.fotos\`: imagem não existe: images/${f}`);
+  });
+  const fotosHtml = (indent) => [[fotos.slice(0, 2), 'covers-big'], [fotos.slice(2), 'covers-grid']]
+    .filter(([lista]) => lista.length)
+    .map(([lista, classe]) => [
+      `${indent}<div class="${classe} reveal">`,
+      ...lista.map((f) => `${indent}  <a href="images/${escapar(f)}"><img src="images/${escapar(f)}" alt="" loading="lazy"></a>`),
+      `${indent}</div>`,
+    ].join('\n')).join('\n');
 
   // Hero do EPK (epk.yaml): `<!-- @epk-hero -->` em epk.html dá lugar à imagem `hero_horizontal`
   // (.hero-h) e à `hero_vertical` (.hero-v, o CSS mostra-a só em ecrãs na vertical).
@@ -668,7 +867,11 @@ async function main() {
     if (pagina === 'index.html') {
       html = substituirMarcador(html, /^[ \t]*<!-- @hero-imagens.*-->/m, heroImagens, pagina);
       html = substituirMarcador(html, /^[ \t]*<!-- @hero-cta.*-->\r?\n?/m, heroCta(lingua), pagina);
+      html = substituirMarcador(html, /^([ \t]*)<!-- @about.*-->/m, (_, indent) => sobre[lingua].map((l) => indent + l).join('\n'), pagina);
       html = substituirMarcador(html, /^([ \t]*)<!-- @agenda -->\r?\n?/m, agendaHtml(lingua), pagina);
+      html = substituirMarcador(html, /^([ \t]*)<!-- @video-destaque -->/m, (_, indent) => destaqueHtml(lingua, indent), pagina);
+      html = substituirMarcador(html, /^([ \t]*)<!-- @videos -->\r?\n?/m, (_, indent) => videosHtml(lingua, indent), pagina);
+      html = substituirMarcador(html, /^([ \t]*)<!-- @fotos -->\r?\n?/m, (_, indent) => fotosHtml(indent) + (fotos.length ? '\n' : ''), pagina);
     }
     if (pagina === 'epk.html') {
       html = substituirMarcador(html, /^([ \t]*)<!-- @epk-hero -->/m, (_, indent) => epkHero.map((l) => indent + l).join('\n'), pagina);

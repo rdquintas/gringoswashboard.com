@@ -195,7 +195,8 @@ button { font: inherit; cursor: pointer; }
 
 /* Video thumbs */
 .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 760px; margin: 0 auto 50px; }
-.video-thumb { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #111; }
+.video-grid--single { grid-template-columns: 1fr; max-width: 560px; }
+.video-thumb {position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #111; }
 .video-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease), filter 600ms var(--ease); filter: brightness(.85); }
 .video-thumb::after {
   content: "\f04b"; font-family: "Font Awesome 6 Free"; font-weight: 900;
@@ -239,16 +240,19 @@ button { font: inherit; cursor: pointer; }
 .covers-big { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
 .covers-big a { display: block; }
 .covers-big img { width: min(240px, 42vw); aspect-ratio: 1; object-fit: cover; box-shadow: 0 16px 30px rgba(0,0,0,.45); }
-.covers-big a:first-child img { transform: rotate(-3deg); }
-.covers-big a:last-child img { transform: rotate(3deg); }
+.covers-big a:first-child img { --rot: -3deg; }
+.covers-big a:last-child img { --rot: 3deg; }
 .covers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 520px; margin: 0 auto; }
 .covers-grid img {
   width: 100%; aspect-ratio: 1; object-fit: cover;
   box-shadow: 0 8px 16px rgba(0,0,0,.4);
+}
+.covers-big img, .covers-grid img {
   transform: rotate(var(--rot, 0deg));
   transition: transform 400ms var(--ease), box-shadow 400ms var(--ease);
 }
 .covers-grid a:hover img { transform: rotate(0) scale(1.08); box-shadow: 0 14px 26px rgba(0,0,0,.5); position: relative; z-index: 1; }
+.covers-big a:hover img { transform: rotate(0) scale(1.08); box-shadow: 0 22px 40px rgba(0,0,0,.55); position: relative; z-index: 1; }
 
 /* Lightbox das capas (<dialog> criado pelo JS) */
 .lightbox {
