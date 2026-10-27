@@ -2,7 +2,7 @@
 
 Site estático da **Gringos Washboard Band** (gringoswashboard.com), por agora publicado no **GitHub Pages** a partir de `dist/` (`https://rdquintas.github.io/gringoswashboard.com/dist/`); o `netlify.toml` fica preparado para mais tarde. O `README.md` tem a documentação completa; este ficheiro é o resumo para trabalhar no código.
 
-Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens do build e commits. O conteúdo do site está em português (`lang="pt-PT"`); nomes de canções, álbuns e publicações ficam no original.
+Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens do build e commits. O site é bilingue: português (`lang="pt-PT"`, na raiz) e inglês (`lang="en"`, em `en/`) — ver **Línguas**; nomes de canções, álbuns e publicações ficam no original.
 
 ## Estado atual
 
@@ -23,7 +23,7 @@ Node 22 (`.nvmrc`, `netlify.toml`).
 
 ## Estrutura
 
-- **`build.js`** — limpa `dist/`, copia `src/` para lá (exceto `conteudo/` e `partials/`), inclui os partials, aplica as configurações de `src/conteudo/home.yaml` (parser YAML mínimo próprio: mapas e listas, incluindo listas de mapas `- chave: valor`, aninhados por indentação com espaços), converte as imagens e gera `sitemap.xml` (um URL por cada `.html` na raiz de `src/`, `lastmod` = data do ficheiro) e `robots.txt`. URL base na constante `SITE_URL`.
+- **`build.js`** — limpa `dist/`, copia `src/` para lá (exceto `conteudo/`, `partials/` e as páginas), gera cada página uma vez por língua (constante `LINGUAS`), inclui os partials, aplica as configurações de `src/conteudo/home.yaml` (parser YAML mínimo próprio: mapas e listas, incluindo listas de mapas `- chave: valor`, aninhados por indentação com espaços), converte as imagens e gera `sitemap.xml` (um URL por cada `.html` na raiz de `src/` em cada língua, `lastmod` = data do ficheiro) e `robots.txt`. URL base na constante `SITE_URL`.
 - **`src/`** — ficheiros do site:
   - `conteudo/home.yaml` — configurações do site, agrupadas por secção: `section_hero` com `hero` (lista de imagens do slideshow, em `images/`) e `duracao_hero` (segundos que cada imagem fica visível); `section_about` com `members` (lista com `nome`, `instrumento.pt`/`instrumento.en` e `foto`; ainda não usada pelo build).
   - `conteudo/site.yaml` — dados comuns a todas as páginas: `contactos` (o build substitui cada `<!-- @email -->` pelo link `mailto:` de `contactos.email` e cada `<!-- @telefone -->` pelo link `tel:` de `contactos.telefone`) e `links` (redes sociais: `facebook`, `instagram`, `youtube`, `spotify`, `soundcloud`, `bandcamp`; as aceites estão na constante `REDES` do `build.js`). O build substitui cada `<!-- @social -->` dos partials pela `<ul class="social">`, pela ordem do YAML, com `target="_blank" rel="noopener"`; uma rede com link vazio não é colocada (sem nenhuma, a `<ul>` também não).
@@ -37,7 +37,8 @@ Node 22 (`.nvmrc`, `netlify.toml`).
 
 ## Convenções
 
-- **Hero:** as imagens e o tempo vêm do `home.yaml`. O build substitui `<!-- @hero-imagens -->` em `index.html` pelas `<img>` e `/* @hero-animacao */` em `style.css` pela animação (`@keyframes hero-fade`, ciclo = nº de imagens × `duracao_hero`, `animation-delay` negativos, fade de 1,5s na constante `HERO_FADE`). Crossfade só com CSS. Os botões vêm de `cta1` (dourado) e `cta2` (preto), com texto em `pt` e `link`: o build substitui `<!-- @hero-cta -->` pelo `<div class="hero-cta">`; um CTA com `link` vazio não é colocado (sem nenhum, o `<div>` também não).
+- **Hero:** as imagens e o tempo vêm do `home.yaml`. O build substitui `<!-- @hero-imagens -->` em `index.html` pelas `<img>` e `/* @hero-animacao */` em `style.css` pela animação (`@keyframes hero-fade`, ciclo = nº de imagens × `duracao_hero`, `animation-delay` negativos, fade de 1,5s na constante `HERO_FADE`). Crossfade só com CSS. Os botões vêm de `cta1` (dourado) e `cta2` (preto), com texto em `pt`/`en` e `link`: o build substitui `<!-- @hero-cta -->` pelo `<div class="hero-cta">`; um CTA com `link` vazio não é colocado (sem nenhum, o `<div>` também não).
+- **Línguas:** cada página de `src/` dá `dist/pagina.html` (pt) e `dist/en/pagina.html` (en). O texto traduzível escreve-se `{{#lang pt}}A nossa história{{/lang}}{{#lang en}}Our story{{/lang}}` (em páginas, partials e atributos, incluindo os do `<!-- @partial header … -->`); o build fica só com o bloco da língua da página e, se um bloco de outra língua ocupar linhas inteiras, tira essas linhas. Blocos não se aninham; língua desconhecida ou bloco sem par dão erro. Nas páginas em `en/`, os caminhos relativos para recursos (`css/`, `js/`, `images/`…) levam `../` automaticamente; os links para `.html` ficam iguais. `<!-- @idioma -->` (menu e footer) dá o link para a mesma página na outra língua (com bandeira `flag-pt.svg`/`flag-uk.svg`) e `<!-- @hreflang -->` (no `<head>`) os `<link rel="alternate" hreflang>`. Textos criados pelo `main.js` usam `t(pt, en)`, conforme o `<html lang>`. Os CTAs do hero usam `pt`/`en` do `home.yaml`.
 - **Movimento reduzido:** respeitar `prefers-reduced-motion` — no CSS há um bloco global que desliga animações/transições, e o JS verifica `reduceMotion` antes de animar.
 - **Acessibilidade:** `aria-label` nos links só com ícone, `alt=""` em imagens decorativas, `aria-expanded`/`aria-hidden` atualizados pelo JS no menu.
 

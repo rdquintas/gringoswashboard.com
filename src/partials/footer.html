@@ -1,16 +1,16 @@
 <div class="wrap">
   <div class="footer-top">
     <div>
-      <h4>Newsletter da Gringo's</h4>
-      <p>Inscreve-te para receberes novidades sobre música nova, concertos e um ou outro percalço com a tábua de lavar.</p>
+      <h4>{{#lang pt}}Newsletter da Gringo's{{/lang}}{{#lang en}}The Gringo's Newsletter{{/lang}}</h4>
+      <p>{{#lang pt}}Inscreve-te para receberes novidades sobre música nova, concertos e um ou outro percalço com a tábua de lavar.{{/lang}}{{#lang en}}Sign up for news about new music, gigs and the occasional washboard mishap.{{/lang}}</p>
       <form class="newsletter" novalidate>
         <div class="row">
-          <label class="visually-hidden" for="nl-name">Nome próprio</label>
-          <input id="nl-name" type="text" name="name" placeholder="Nome" autocomplete="given-name">
-          <label class="visually-hidden" for="nl-email">E-mail</label>
-          <input id="nl-email" type="email" name="email" placeholder="O teu e-mail" autocomplete="email" required>
+          <label class="visually-hidden" for="nl-name">{{#lang pt}}Nome próprio{{/lang}}{{#lang en}}First name{{/lang}}</label>
+          <input id="nl-name" type="text" name="name" placeholder="{{#lang pt}}Nome{{/lang}}{{#lang en}}Name{{/lang}}" autocomplete="given-name">
+          <label class="visually-hidden" for="nl-email">{{#lang pt}}E-mail{{/lang}}{{#lang en}}Email{{/lang}}</label>
+          <input id="nl-email" type="email" name="email" placeholder="{{#lang pt}}O teu e-mail{{/lang}}{{#lang en}}Your email{{/lang}}" autocomplete="email" required>
         </div>
-        <button class="btn btn--gold" type="submit">Subscrever novidades</button>
+        <button class="btn btn--gold" type="submit">{{#lang pt}}Subscrever novidades{{/lang}}{{#lang en}}Subscribe for updates{{/lang}}</button>
         <p class="newsletter-msg" role="status"></p>
       </form>
     </div>
@@ -22,21 +22,21 @@
       </div>
       <div>
         <i class="fa-solid fa-phone"></i>
-        <p><strong>Telefone</strong>
+        <p><strong>{{#lang pt}}Telefone{{/lang}}{{#lang en}}Phone{{/lang}}</strong>
           <!-- @telefone --></p>
       </div>
     </div>
   </div>
   <div class="footer-nav">
     <ul>
-      <li><a href="index.html">Início</a></li>
-      <li><a href="index.html#band">Sobre</a></li>
-      <li><a href="index.html#videos">Média</a></li>
-      <li><a href="index.html#tour">Agenda</a></li>
-      <li><a href="#" lang="en">English <img class="flag" src="images/flag-uk.svg" alt="" width="24" height="12"></a></li>
+      <li><a href="index.html">{{#lang pt}}Início{{/lang}}{{#lang en}}Home{{/lang}}</a></li>
+      <li><a href="index.html#band">{{#lang pt}}Sobre{{/lang}}{{#lang en}}About{{/lang}}</a></li>
+      <li><a href="index.html#videos">{{#lang pt}}Média{{/lang}}{{#lang en}}Media{{/lang}}</a></li>
+      <li><a href="index.html#tour">{{#lang pt}}Agenda{{/lang}}{{#lang en}}Tour{{/lang}}</a></li>
+      <li><!-- @idioma --></li>
     </ul>
     <!-- @social -->
   </div>
-  <div class="footer-legal"><a href="#">Política de Privacidade</a><a href="#">Política de Cookies</a></div>
+  <div class="footer-legal"><a href="#">{{#lang pt}}Política de Privacidade{{/lang}}{{#lang en}}Privacy Policy{{/lang}}</a><a href="#">{{#lang pt}}Política de Cookies{{/lang}}{{#lang en}}Cookie Policy{{/lang}}</a></div>
   <p class="copyright">&copy;<span data-year>2026</span> Designed by <a href="https://ricardoquintas.com/" target="_blank" rel="noopener">Ricardo Quintas</a></p>
 </div>

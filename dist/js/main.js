@@ -6,6 +6,9 @@
 
   document.documentElement.classList.add("js");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Textos criados pelo JS: na língua da página (<html lang>), português por omissão
+  var en = document.documentElement.lang === "en";
+  function t(pt, enText) { return en ? enText : pt; }
 
   /* ---------- Fullscreen menu ---------- */
   var menu = document.querySelector(".menu");
@@ -95,7 +98,7 @@
     slides.forEach(function (_, i) {
       var b = document.createElement("button");
       b.type = "button";
-      b.setAttribute("aria-label", "Ver crítica " + (i + 1));
+      b.setAttribute("aria-label", t("Ver crítica ", "Show review ") + (i + 1));
       b.addEventListener("click", function () { go(i); restart(); });
       dotsWrap.appendChild(b);
     });
@@ -141,7 +144,7 @@
       });
       if (moreBtn) {
         moreBtn.hidden = total <= VISIBLE;
-        moreBtn.textContent = expanded ? "Ver menos datas" : "Ver todas as datas";
+        moreBtn.textContent = expanded ? t("Ver menos datas", "See fewer dates") : t("Ver todas as datas", "See all dates");
       }
     }
     tabs.forEach(function (t) {
@@ -186,7 +189,7 @@
       e.preventDefault();
       var wrap = document.createElement("div");
       wrap.className = "video-thumb video-thumb--playing";
-      var iframe = youtubePlayer(link.dataset.youtube, link.getAttribute("aria-label").replace(/^Ver vídeo no YouTube: /, ""));
+      var iframe = youtubePlayer(link.dataset.youtube, link.getAttribute("aria-label").replace(/^[^:]*: /, ""));
       wrap.appendChild(iframe);
       link.replaceWith(wrap);
       iframe.focus();
@@ -199,7 +202,7 @@
     function play(e) {
       if (e) e.preventDefault();
       if (embed.classList.contains("is-playing")) return;
-      var iframe = youtubePlayer(embed.dataset.youtube, embed.dataset.title || "Vídeo do YouTube");
+      var iframe = youtubePlayer(embed.dataset.youtube, embed.dataset.title || t("Vídeo do YouTube", "YouTube video"));
       embed.classList.add("is-playing");
       embed.replaceChildren(iframe);
       iframe.focus();
@@ -222,11 +225,11 @@
       var msg = form.querySelector(".newsletter-msg");
       var email = form.querySelector('input[type="email"]');
       if (!email.value || !email.checkValidity()) {
-        msg.textContent = "Introduz um e-mail válido.";
+        msg.textContent = t("Introduz um e-mail válido.", "Please enter a valid email.");
         email.focus();
         return;
       }
-      msg.textContent = "Obrigado! Já estás na lista. Tem a tábua de lavar à mão.";
+      msg.textContent = t("Obrigado! Já estás na lista. Tem a tábua de lavar à mão.", "Thanks! You're on the list. Keep your washboard handy.");
       form.reset();
     });
   });

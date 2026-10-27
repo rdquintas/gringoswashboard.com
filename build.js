@@ -1,6 +1,8 @@
-// Build: copia src/ para dist/ (limpa dist/ antes), inclui os partials (header, footer),
-// aplica as configurações de src/conteudo/home.yaml (hero) e site.yaml (redes sociais), converte as imagens para AVIF e WebP (com <picture> e
-// fallback para o original) e gera sitemap.xml e robots.txt.
+// Build: copia src/ para dist/ (limpa dist/ antes) e gera cada página numa versão por língua
+// (pt em dist/, en em dist/en/), escolhendo os blocos {{#lang xx}}…{{/lang}}. Inclui os partials
+// (header, footer), aplica as configurações de src/conteudo/home.yaml (hero) e site.yaml (redes
+// sociais, contactos), converte as imagens para AVIF e WebP (com <picture> e fallback para o
+// original) e gera sitemap.xml e robots.txt.
 const fs = require('node:fs');
 const path = require('node:path');
 const sharp = require('sharp');
@@ -13,6 +15,12 @@ const CACHE = path.join(__dirname, '.cache', 'images');
 const SITE_URL = 'https://gringoswashboard.com/';
 const HERO_FADE = 1.5; // segundos de crossfade entre imagens do hero
 const IMG_CONVERTIVEIS = /\.(png|jpe?g)$/i;
+// Línguas do site: pasta em dist/ (a primeira é a principal, na raiz), código para lang/hreflang
+// e nome e bandeira (em images/) do link para mudar de língua.
+const LINGUAS = {
+  pt: { pasta: '', codigo: 'pt-PT', nome: 'Português', bandeira: 'flag-pt.svg' },
+  en: { pasta: 'en/', codigo: 'en', nome: 'English', bandeira: 'flag-uk.svg' },
+};
 // Redes sociais aceites em `links` do site.yaml: nome (aria-label) e ícone do Font Awesome.
 const REDES = {
   facebook: ['Facebook', 'fa-facebook'],
@@ -79,19 +87,17 @@ function lerYaml(ficheiro) {
   return dados;
 }
 
-function substituirMarcador(ficheiro, marcador, conteudo) {
-  const texto = fs.readFileSync(ficheiro, 'utf8');
-  if (!marcador.test(texto)) throw new Error(`Marcador ${marcador} não encontrado em ${ficheiro}`);
-  fs.writeFileSync(ficheiro, texto.replace(marcador, () => conteudo));
+function substituirMarcador(texto, marcador, conteudo, onde) {
+  if (!marcador.test(texto)) throw new Error(`Marcador ${marcador} não encontrado em ${onde}`);
+  return texto.replace(marcador, () => conteudo);
 }
 
 // Substitui cada `<!-- @partial nome chave="valor" … -->` pelo conteúdo de src/partials/nome.html,
 // indentado como o marcador. Cada `{{chave}}` do partial leva o valor do atributo com o mesmo
 // nome (obrigatório); `{{chave?}}` é opcional e fica vazio, e um `class=""` que daí resulte sai.
 // No header, o link do menu para a própria página leva aria-current="page".
-function incluirPartials(ficheiro) {
-  const pagina = path.basename(ficheiro);
-  const html = fs.readFileSync(ficheiro, 'utf8').replace(/^([ \t]*)<!-- @partial ([\w-]+)((?:\s+[\w-]+="[^"]*")*)\s*-->/gm, (_, indent, nome, atributos) => {
+function incluirPartials(html, pagina) {
+  return html.replace(/^([ \t]*)<!-- @partial ([\w-]+)((?:\s+[\w-]+="[^"]*")*)\s*-->/gm, (_, indent, nome, atributos) => {
     const origem = path.join(PARTIALS, `${nome}.html`);
     if (!fs.existsSync(origem)) throw new Error(`${pagina}: partial não existe: partials/${nome}.html`);
     const valores = Object.fromEntries([...atributos.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => m.slice(1)));
@@ -105,7 +111,32 @@ function incluirPartials(ficheiro) {
     if (nome === 'header') partial = partial.replace(`<a href="${pagina}">`, `<a href="${pagina}" aria-current="page">`);
     return partial.split(/\r?\n/).map((l) => (l ? indent + l : l)).join('\n');
   });
-  fs.writeFileSync(ficheiro, html);
+}
+
+// Fica só com o conteúdo dos blocos `{{#lang xx}}…{{/lang}}` da língua `lingua` (os blocos podem
+// ocupar várias linhas, mas não se podem aninhar). Um bloco de outra língua que ocupe linhas
+// inteiras sai com elas, para não deixar linhas em branco.
+function escolherLingua(html, lingua, pagina) {
+  const BLOCO = /(^[ \t]*)?\{\{#lang ([\w-]+)\}\}([\s\S]*?)\{\{\/lang\}\}([ \t]*\r?\n)?/gm;
+  const resultado = html.replace(BLOCO, (_, inicio, l, conteudo, fim) => {
+    if (!LINGUAS[l]) throw new Error(`${pagina}: língua desconhecida em {{#lang ${l}}} (conhecidas: ${Object.keys(LINGUAS).join(', ')})`);
+    if (conteudo.includes('{{#lang')) throw new Error(`${pagina}: blocos {{#lang}} aninhados ou sem {{/lang}}`);
+    if (l === lingua) return (inicio ?? '') + conteudo + (fim ?? '');
+    return inicio !== undefined && fim !== undefined ? '' : (inicio ?? '') + (fim ?? '');
+  });
+  const solto = resultado.match(/\{\{[#/]lang\b[^}]*\}\}/);
+  if (solto) throw new Error(`${pagina}: ${solto[0]} sem par`);
+  return resultado;
+}
+
+// Numa página que fica numa subpasta de dist/ (ex.: en/), os caminhos relativos para recursos
+// (css/, js/, images/…) passam a subir `nivel` pastas; os links para páginas .html ficam, porque
+// cada língua tem as mesmas páginas.
+function subirCaminhos(html, nivel) {
+  const prefixo = '../'.repeat(nivel);
+  const subir = (url) => (url === '' || /^([a-z][\w+.-]*:|#|\/)/i.test(url) || /\.html([#?]|$)/.test(url) ? url : prefixo + url);
+  return html.replace(/(\s(?:src|href|srcset)=")([^"]*)"/g, (_, atributo, valor) =>
+    atributo + (atributo.includes('srcset') ? valor.split(',').map((c) => c.trim().replace(/^\S+/, subir)).join(', ') : subir(valor)) + '"');
 }
 
 // Converte cada PNG/JPG de src/images/ para AVIF e WebP em dist/images/, ao lado do original
@@ -131,25 +162,29 @@ async function converterImagens() {
 
 // Envolve cada <img> de uma imagem local convertível num <picture> com <source> AVIF e WebP;
 // o <img> original fica como fallback para browsers sem suporte para esses formatos.
-function usarPicture(ficheiro) {
-  const html = fs.readFileSync(ficheiro, 'utf8').replace(/<img\b[^>]*>/g, (img) => {
+function usarPicture(html) {
+  return html.replace(/<img\b[^>]*>/g, (img) => {
     const src = img.match(/\ssrc="(images\/[^"]+)"/);
     if (!src || !IMG_CONVERTIVEIS.test(src[1])) return img;
     const sources = FORMATOS.map(({ ext, type }) =>
       `<source srcset="${src[1].replace(IMG_CONVERTIVEIS, '.' + ext)}" type="${type}">`);
     return `<picture>${sources.join('')}${img}</picture>`;
   });
-  fs.writeFileSync(ficheiro, html);
 }
 
 async function main() {
   const config = lerYaml(path.join(CONTEUDO, 'home.yaml'));
   const site = lerYaml(path.join(CONTEUDO, 'site.yaml'));
+  const escapar = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
+  // As páginas (.html na raiz de src/) são geradas abaixo, uma vez por língua; o resto é copiado.
+  const paginas = fs.readdirSync(SRC).filter((f) => f.endsWith('.html'))
+    .sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b)));
   fs.rmSync(DIST, { recursive: true, force: true });
-  fs.cpSync(SRC, DIST, { recursive: true, filter: (f) => f !== CONTEUDO && f !== PARTIALS });
-  const paginas = fs.readdirSync(DIST).filter((f) => f.endsWith('.html'));
-  paginas.forEach((f) => incluirPartials(path.join(DIST, f)));
+  fs.cpSync(SRC, DIST, {
+    recursive: true,
+    filter: (f) => f !== CONTEUDO && f !== PARTIALS && !(path.dirname(f) === SRC && f.endsWith('.html')),
+  });
 
   // Hero (`section_hero`): <img> a partir de `hero`, botões a partir de `cta1`/`cta2` e
   // animação de crossfade a partir de `duracao_hero`.
@@ -160,22 +195,20 @@ async function main() {
     if (!fs.existsSync(path.join(SRC, 'images', img))) throw new Error(`home.yaml: imagem do hero não existe: images/${img}`);
     if (!IMG_CONVERTIVEIS.test(img)) throw new Error(`home.yaml: imagem do hero tem de ser PNG ou JPG: ${img}`);
   });
+  const heroImagens = hero.map((img) => `      <img src="images/${img}" alt="" width="1920" height="900">`).join('\n');
 
-  substituirMarcador(path.join(DIST, 'index.html'), /^[ \t]*<!-- @hero-imagens.*-->/m,
-    hero.map((img) => `      <img src="images/${img}" alt="" width="1920" height="900">`).join('\n'));
-
-  // Botões do hero a partir de `cta1` (dourado) e `cta2` (preto), com o texto em `pt`.
-  // Um CTA sem `link` não é colocado; sem nenhum, não fica o contentor .hero-cta.
-  const escapar = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-  const ctas = [['cta1', 'btn--gold'], ['cta2', 'btn--black']]
-    .filter(([chave]) => String(config.section_hero[chave]?.link ?? '').trim() !== '')
-    .map(([chave, classe]) => {
-      const { pt, link } = config.section_hero[chave];
-      if (!pt) throw new Error(`home.yaml: \`section_hero.${chave}.pt\` tem de ter o texto do botão`);
-      return `        <a class="btn ${classe}" href="${escapar(link)}">${escapar(pt)}</a>`;
-    });
-  substituirMarcador(path.join(DIST, 'index.html'), /^[ \t]*<!-- @hero-cta.*-->\n?/m,
-    ctas.length ? `      <div class="hero-cta">\n${ctas.join('\n')}\n      </div>\n` : '');
+  // Botões do hero a partir de `cta1` (dourado) e `cta2` (preto), com o texto na língua da
+  // página (`pt`, `en`). Um CTA sem `link` não é colocado; sem nenhum, não fica o contentor .hero-cta.
+  const heroCta = (lingua) => {
+    const ctas = [['cta1', 'btn--gold'], ['cta2', 'btn--black']]
+      .filter(([chave]) => String(config.section_hero[chave]?.link ?? '').trim() !== '')
+      .map(([chave, classe]) => {
+        const { [lingua]: texto, link } = config.section_hero[chave];
+        if (!texto) throw new Error(`home.yaml: \`section_hero.${chave}.${lingua}\` tem de ter o texto do botão`);
+        return `        <a class="btn ${classe}" href="${escapar(link)}">${escapar(texto)}</a>`;
+      });
+    return ctas.length ? `      <div class="hero-cta">\n${ctas.join('\n')}\n      </div>\n` : '';
+  };
 
   // Cada imagem fica `duracao` s visível; o ciclo é n × duracao. A imagem k começa a aparecer
   // em k × duracao − fade, para a primeira já estar visível ao carregar a página.
@@ -196,7 +229,8 @@ async function main() {
       `  100% { opacity: 0; }`,
       '}',
     ].join('\n');
-  substituirMarcador(path.join(DIST, 'css', 'style.css'), /\/\* @hero-animacao \*\//, cssHero);
+  const css = path.join(DIST, 'css', 'style.css');
+  fs.writeFileSync(css, substituirMarcador(fs.readFileSync(css, 'utf8'), /\/\* @hero-animacao \*\//, cssHero, 'css/style.css'));
 
   // Redes sociais (`links` do site.yaml): cada `<!-- @social -->` dos partials dá lugar à
   // lista de ícones, pela ordem do YAML, abertos noutra janela. Uma rede com link vazio não
@@ -216,28 +250,51 @@ async function main() {
   const telefone = String(site.contactos?.telefone ?? '').trim();
   if (!telefone) throw new Error('site.yaml: `contactos.telefone` tem de ter o telefone de contacto');
   const linkTelefone = `<a href="tel:${escapar(telefone.replace(/\s/g, ''))}">${escapar(telefone)}</a>`;
-  paginas.forEach((f) => {
-    const ficheiro = path.join(DIST, f);
-    const html = fs.readFileSync(ficheiro, 'utf8').replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, (_, indent) =>
-      social.length ? [`${indent}<ul class="social">`, ...social.map((li) => `${indent}  ${li}`), `${indent}</ul>`].join('\n') + '\n' : '')
-      .replace(/<!-- @email -->/g, linkEmail)
-      .replace(/<!-- @telefone -->/g, linkTelefone);
-    fs.writeFileSync(ficheiro, html);
+
+  // URL público de uma página numa língua (index.html → raiz da pasta da língua).
+  const url = (lingua, pagina) => SITE_URL + LINGUAS[lingua].pasta + (pagina === 'index.html' ? '' : pagina);
+
+  // Cada página, em cada língua: partials, blocos {{#lang}}, marcadores, <picture> e, nas
+  // línguas em subpasta, caminhos dos recursos a subir até à raiz de dist/.
+  Object.entries(LINGUAS).forEach(([lingua, { pasta }]) => {
+    const nivel = pasta.split('/').filter(Boolean).length;
+    fs.mkdirSync(path.join(DIST, pasta), { recursive: true });
+    paginas.forEach((pagina) => {
+      let html = incluirPartials(fs.readFileSync(path.join(SRC, pagina), 'utf8'), pagina);
+      html = escolherLingua(html, lingua, pagina);
+      if (pagina === 'index.html') {
+        html = substituirMarcador(html, /^[ \t]*<!-- @hero-imagens.*-->/m, heroImagens, pagina);
+        html = substituirMarcador(html, /^[ \t]*<!-- @hero-cta.*-->\r?\n?/m, heroCta(lingua), pagina);
+      }
+      // `<!-- @idioma -->`: link para a mesma página nas outras línguas; `<!-- @hreflang -->`:
+      // um <link rel="alternate"> por língua (mais x-default, a principal).
+      const idioma = Object.entries(LINGUAS).filter(([l]) => l !== lingua).map(([, outra]) =>
+        `<a href="${'../'.repeat(nivel)}${outra.pasta}${pagina}" lang="${outra.codigo}" hreflang="${outra.codigo}">${outra.nome} <img class="flag" src="images/${outra.bandeira}" alt="" width="24" height="12"></a>`).join(' ');
+      const hreflang = (indent) => [
+        ...Object.entries(LINGUAS).map(([l, { codigo }]) => `<link rel="alternate" hreflang="${codigo}" href="${url(l, pagina)}">`),
+        `<link rel="alternate" hreflang="x-default" href="${url(Object.keys(LINGUAS)[0], pagina)}">`,
+      ].map((l) => indent + l).join('\n');
+      html = html
+        .replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, (_, indent) =>
+          social.length ? [`${indent}<ul class="social">`, ...social.map((li) => `${indent}  ${li}`), `${indent}</ul>`].join('\n') + '\n' : '')
+        .replace(/^([ \t]*)<!-- @hreflang -->/gm, (_, indent) => hreflang(indent))
+        .replace(/<!-- @idioma -->/g, idioma)
+        .replace(/<!-- @email -->/g, linkEmail)
+        .replace(/<!-- @telefone -->/g, linkTelefone);
+      html = usarPicture(html);
+      if (nivel) html = subirCaminhos(html, nivel);
+      fs.writeFileSync(path.join(DIST, pasta, pagina), html);
+    });
   });
 
-  // Imagens: AVIF + WebP e <picture> em todas as páginas.
+  // Imagens: AVIF + WebP (os <picture> já foram postos nas páginas).
   const imagens = await converterImagens();
-  paginas.forEach((f) => usarPicture(path.join(DIST, f)));
 
-  // Sitemap: uma entrada por cada .html na raiz de src/ (index.html → raiz do site).
-  const urls = fs.readdirSync(SRC)
-    .filter((f) => f.endsWith('.html'))
-    .sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b)))
-    .map((f) => {
-      const loc = SITE_URL + (f === 'index.html' ? '' : f);
-      const lastmod = fs.statSync(path.join(SRC, f)).mtime.toISOString().slice(0, 10);
-      return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;
-    });
+  // Sitemap: uma entrada por cada página em cada língua (index.html → raiz da língua).
+  const urls = Object.keys(LINGUAS).flatMap((lingua) => paginas.map((pagina) => {
+    const lastmod = fs.statSync(path.join(SRC, pagina)).mtime.toISOString().slice(0, 10);
+    return `  <url>\n    <loc>${url(lingua, pagina)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;
+  }));
 
   fs.writeFileSync(path.join(DIST, 'sitemap.xml'),
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -247,7 +304,7 @@ async function main() {
   fs.writeFileSync(path.join(DIST, 'robots.txt'),
     `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
-  console.log(`Build concluído: src/ → dist/ (${imagens.total} imagens em AVIF/WebP, ${imagens.convertidas} conversões novas; sitemap com ${urls.length} páginas, robots.txt)`);
+  console.log(`Build concluído: src/ → dist/ (${paginas.length} páginas em ${Object.keys(LINGUAS).join(', ')}; ${imagens.total} imagens em AVIF/WebP, ${imagens.convertidas} conversões novas; sitemap com ${urls.length} URLs, robots.txt)`);
 }
 
 main().catch((err) => {

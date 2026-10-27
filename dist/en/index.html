@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<!-- 
+   Hi, you're looking at a web page built with love by:
+
+   Ricardo
+
+  /$$$$$$            /$$             /$$                        
+ /$$__  $$          |__/            | $$                        
+| $$  \ $$ /$$   /$$ /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$$
+| $$  | $$| $$  | $$| $$| $$__  $$|_  $$_/   |____  $$ /$$_____/
+| $$  | $$| $$  | $$| $$| $$  \ $$  | $$      /$$$$$$$|  $$$$$$ 
+| $$/$$ $$| $$  | $$| $$| $$  | $$  | $$ /$$ /$$__  $$ \____  $$
+|  $$$$$$/|  $$$$$$/| $$| $$  | $$  |  $$$$/|  $$$$$$$ /$$$$$$$/
+ \____ $$$ \______/ |__/|__/  |__/   \___/   \_______/|_______/ 
+      \__/                                                                      
+
+   http://www.ricardoquintas.com
+   
+   October/2026
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gringo's Washboard Band</title>
+  <meta name="description" content="Gringo's Washboard Band — washboard, jug band blues, ragtime and swing. The new album Rub-a-Dub Blues is out now.">
+  <link rel="alternate" hreflang="pt-PT" href="https://gringoswashboard.com/">
+  <link rel="alternate" hreflang="en" href="https://gringoswashboard.com/en/">
+  <link rel="alternate" hreflang="x-default" href="https://gringoswashboard.com/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Catamaran:wght@400;700&family=Oswald:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="site-header">
+    <a class="logo" href="index.html" aria-label="Gringo's Washboard Band — home">
+      <picture><source srcset="../images/logo.avif" type="image/avif"><source srcset="../images/logo.webp" type="image/webp"><img src="../images/logo.jpg" alt="" width="100" height="100"></picture>
+    </a>
+    <div class="header-right">
+      <ul class="social">
+        <li><a class="fx-tada" href="https://www.facebook.com/gringoswashboard" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a></li>
+        <li><a class="fx-tada" href="https://www.instagram.com/gringoswb" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+        <li><a class="fx-tada" href="https://www.youtube.com/gringoswashboard" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></li>
+      </ul>
+      <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== Fullscreen menu ===== -->
+  <div class="menu" id="menu" aria-hidden="true">
+    <button class="menu-close" type="button" aria-label="Close menu">&times;</button>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="index.html" aria-current="page">Home</a></li>
+        <li><a href="index.html#band">About</a></li>
+        <li><a href="index.html#videos">Media</a></li>
+        <li><a href="index.html#tour">Tour</a></li>
+        <li><a href="../index.html" lang="pt-PT" hreflang="pt-PT">Português <img class="flag" src="../images/flag-pt.svg" alt="" width="24" height="12"></a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <ul class="social">
+        <li><a class="fx-tada" href="https://www.facebook.com/gringoswashboard" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a></li>
+        <li><a class="fx-tada" href="https://www.instagram.com/gringoswb" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+        <li><a class="fx-tada" href="https://www.youtube.com/gringoswashboard" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <main>
+    <!-- ===== Hero ===== -->
+    <section class="hero" aria-label="Gringo's Washboard Band live">
+      <picture><source srcset="../images/hero01.avif" type="image/avif"><source srcset="../images/hero01.webp" type="image/webp"><img src="../images/hero01.png" alt="" width="1920" height="900"></picture>
+      <picture><source srcset="../images/hero02.avif" type="image/avif"><source srcset="../images/hero02.webp" type="image/webp"><img src="../images/hero02.png" alt="" width="1920" height="900"></picture>
+      <picture><source srcset="../images/hero03.avif" type="image/avif"><source srcset="../images/hero03.webp" type="image/webp"><img src="../images/hero03.png" alt="" width="1920" height="900"></picture>
+      <h1 class="hero-title">Gringo's Washboard Band</h1>
+      <div class="hero-cta">
+        <a class="btn btn--gold" href="#book">Book the Band</a>
+        <a class="btn btn--black" href="#masterclass">Masterclass</a>
+      </div>
+    </section>
+
+    <!-- ===== The band (rust) ===== -->
+    <section class="section section--rust section-pad about" id="band">
+      <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 Q720,150 1440,0 L1440,90 L0,90 Z"/></svg>
+      <div class="wrap">
+        <h2 class="section-title reveal">About Gringo's Washboard Band</h2>
+        <p class="reveal">
+          It started as a dare. In 2016, Zé "Gringo" Tábuas borrowed his grandmother's washboard, a box of sewing thimbles and a street corner in downtown Lisbon — and refused to leave until somebody danced. Somebody did. Then a banjo player joined, then a bass made from a washtub and a broomstick, and Gringo's Washboard Band was born.
+        </p>
+        <p class="pullquote reveal">
+          &ldquo;We play the music people made when they couldn't afford instruments. That's the whole idea — joy is cheap, but it takes work.&rdquo;
+        </p>
+        <div class="about-split">
+          <div class="reveal">
+            <p>
+              Inspired by the jug bands of Memphis, the hokum of 1920s Chicago and the hot swing of Parisian cafés, the five musicians have spent a decade turning bars, festivals and, now and then, a laundromat into dance halls. The shows are loud, sweaty and impossible to watch sitting down.
+            </p>
+            <p>
+              <em>Rub-a-Dub Blues</em>, their third studio album, was recorded live to tape over four days in an old cork factory near Seixal. Twelve songs — eight originals and four lovingly mistreated standards — capture the band the way it sounds on a Saturday night: a little out of breath and grinning ear to ear.
+            </p>
+            <p>
+              "We tried overdubs once," laughs banjo player Rita Banjo. "It sounded like a band. We wanted it to sound like a party."
+            </p>
+          </div>
+          <picture><source srcset="../images/band.avif" type="image/avif"><source srcset="../images/band.webp" type="image/webp"><img class="reveal" src="../images/band.jpg" alt="Group photo of Gringo's Washboard Band" loading="lazy"></picture>
+        </div>
+        <p class="reveal">
+          The band has toured Portugal, Spain, France and the Netherlands, shared stages with swing orchestras and punk bands alike, and once played a wedding aboard a moving tram. It is still looking for a room that can handle it.
+        </p>
+
+        <div class="members">
+          <figure class="member reveal">
+            <picture><source srcset="../images/musico01.avif" type="image/avif"><source srcset="../images/musico01.webp" type="image/webp"><img class="fx-tada" src="../images/musico01.png" alt="Portrait of Zé &quot;Gringo&quot; Tábuas" loading="lazy"></picture>
+            <h4>Zé "Gringo" Tábuas</h4><span>Washboard &amp; vocals</span>
+          </figure>
+          <figure class="member reveal">
+            <picture><source srcset="../images/musico02.avif" type="image/avif"><source srcset="../images/musico02.webp" type="image/webp"><img class="fx-tada" src="../images/musico02.png" alt="Portrait of Rita Banjo" loading="lazy"></picture>
+            <h4>Rita Banjo</h4><span>Banjo &amp; vocals</span>
+          </figure>
+          <figure class="member reveal">
+            <picture><source srcset="../images/musico03.avif" type="image/avif"><source srcset="../images/musico03.webp" type="image/webp"><img class="fx-tada" src="../images/musico03.png" alt="Portrait of Tiago Cordas" loading="lazy"></picture>
+            <h4>Tiago Cordas</h4><span>Guitar</span>
+          </figure>
+          <figure class="member reveal">
+            <picture><source srcset="../images/musico04.avif" type="image/avif"><source srcset="../images/musico04.webp" type="image/webp"><img class="fx-tada" src="../images/musico04.png" alt="Portrait of Nuno Tina" loading="lazy"></picture>
+            <h4>Nuno Tina</h4><span>Washtub bass</span>
+          </figure>
+          <figure class="member reveal">
+            <picture><source srcset="../images/musico05.avif" type="image/avif"><source srcset="../images/musico05.webp" type="image/webp"><img class="fx-tada" src="../images/musico05.png" alt="Portrait of Inês Sopro" loading="lazy"></picture>
+            <h4>Inês Sopro</h4><span>Kazoo &amp; harmonica</span>
+          </figure>
+        </div>
+
+        <!-- Merch -->
+        <div class="merch" id="merch">
+          <h2 class="merch-title reveal"><em>Gringo's</em>MEMBERS</h2>
+          <p class="merch-sub reveal">Oh Yeah Baby!</p>
+          <div class="merch-row">
+            <figure class="reveal"><picture><source srcset="../images/musico01.avif" type="image/avif"><source srcset="../images/musico01.webp" type="image/webp"><img class="fx-tada" src="../images/musico01.png" alt="T-shirt Gringo's" loading="lazy"></picture><figcaption>Zé "Gringo" Tábuas</figcaption></figure>
+            <figure class="reveal"><picture><source srcset="../images/musico02.avif" type="image/avif"><source srcset="../images/musico02.webp" type="image/webp"><img class="fx-tada" src="../images/musico02.png" alt="Gringo's hoodie" loading="lazy"></picture><figcaption>Rita Banjo</figcaption></figure>
+            <figure class="reveal"><picture><source srcset="../images/musico03.avif" type="image/avif"><source srcset="../images/musico03.webp" type="image/webp"><img class="fx-tada" src="../images/musico03.png" alt="Gringo's tote bag" loading="lazy"></picture><figcaption>Inês Sopro</figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Videos + Music (gold) ===== -->
+    <section class="section section--gold section-pad" id="videos">
+      <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,90 Q720,-30 1440,90 Z"/></svg>
+      <div class="wrap">
+        <div class="video-grid reveal">
+          <a class="video-thumb" href="https://www.youtube.com/watch?v=rC4r0hRRDs8" data-youtube="rC4r0hRRDs8" target="_blank" rel="noopener" aria-label="Watch on YouTube: Gringo's Washboard Band — Lisboa"><img src="https://i.ytimg.com/vi/rC4r0hRRDs8/maxresdefault.jpg" alt="Video still: Gringo's Washboard Band — Lisboa" loading="lazy"></a>
+          <a class="video-thumb" href="https://www.youtube.com/watch?v=VrCeZu74GD8" data-youtube="VrCeZu74GD8" target="_blank" rel="noopener" aria-label="Watch on YouTube: Shout, Sister, Shout!"><img src="https://i.ytimg.com/vi/VrCeZu74GD8/maxresdefault.jpg" alt="Video still: Shout, Sister, Shout!" loading="lazy"></a>
+        </div>
+
+        <div id="music">
+          <ul class="stream-icons reveal">
+            <li><a class="fx-tada" href="#" aria-label="Spotify"><i class="fa-brands fa-spotify"></i></a></li>
+            <li><a class="fx-tada" href="#" aria-label="Apple Music"><i class="fa-brands fa-apple"></i></a></li>
+            <li><a class="fx-tada" href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></li>
+            <li><a class="fx-tada" href="#" aria-label="Bandcamp"><i class="fa-brands fa-bandcamp"></i></a></li>
+            <li><a class="fx-tada" href="#" aria-label="Amazon Music"><i class="fa-brands fa-amazon"></i></a></li>
+          </ul>
+          <div class="covers-big reveal">
+            <img src="https://placehold.co/500x500/1b1310/e5bf5e?text=Rub-a-Dub+Blues&font=oswald" alt="Album cover: Rub-a-Dub Blues" loading="lazy">
+            <img src="https://placehold.co/500x500/f1f1f1/9b3921?text=Washhouse+Live&font=oswald" alt="Album cover: Washhouse Live" loading="lazy">
+          </div>
+          <div class="covers-grid reveal">
+          <a href="#" aria-label="Live at the Laundromat"><img src="https://placehold.co/300x300/c2185b/ffffff?text=Live+at+the+Laundromat&font=oswald" alt="Cover: Live at the Laundromat" loading="lazy"></a>
+          <a href="#" aria-label="Scrub Me Mama"><img src="https://placehold.co/300x300/1b1310/e5bf5e?text=Scrub+Me+Mama&font=oswald" alt="Cover: Scrub Me Mama" loading="lazy"></a>
+          <a href="#" aria-label="Tin Can Alley"><img src="https://placehold.co/300x300/2f6f73/fdc111?text=Tin+Can+Alley&font=oswald" alt="Cover: Tin Can Alley" loading="lazy"></a>
+          <a href="#" aria-label="Hokum Holiday"><img src="https://placehold.co/300x300/9b3921/ffffff?text=Hokum+Holiday&font=oswald" alt="Cover: Hokum Holiday" loading="lazy"></a>
+          <a href="#" aria-label="Thimble Stomp"><img src="https://placehold.co/300x300/e5bf5e/1b1310?text=Thimble+Stomp&font=oswald" alt="Cover: Thimble Stomp" loading="lazy"></a>
+          <a href="#" aria-label="Kazoo Kingdom"><img src="https://placehold.co/300x300/3a2a5c/bde7e8?text=Kazoo+Kingdom&font=oswald" alt="Cover: Kazoo Kingdom" loading="lazy"></a>
+          <a href="#" aria-label="Jug Juice"><img src="https://placehold.co/300x300/740101/e5bf5e?text=Jug+Juice&font=oswald" alt="Cover: Jug Juice" loading="lazy"></a>
+          <a href="#" aria-label="Rattle & Roll"><img src="https://placehold.co/300x300/5b5b5b/ffffff?text=Rattle+%26+Roll&font=oswald" alt="Cover: Rattle & Roll" loading="lazy"></a>
+          <a href="#" aria-label="Saturday Night Suds"><img src="https://placehold.co/300x300/bde7e8/740101?text=Saturday+Night+Suds&font=oswald" alt="Cover: Saturday Night Suds" loading="lazy"></a>
+          <a href="#" aria-label="Back Porch Sessions"><img src="https://placehold.co/300x300/1b1310/ffffff?text=Back+Porch+Sessions&font=oswald" alt="Cover: Back Porch Sessions" loading="lazy"></a>
+          <a href="#" aria-label="Ragtime Riot"><img src="https://placehold.co/300x300/d9822b/1b1310?text=Ragtime+Riot&font=oswald" alt="Cover: Ragtime Riot" loading="lazy"></a>
+          <a href="#" aria-label="Clothesline Swing"><img src="https://placehold.co/300x300/ffffff/9b3921?text=Clothesline+Swing&font=oswald" alt="Cover: Clothesline Swing" loading="lazy"></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Live session (grey) ===== -->
+    <section class="section section--grey section-pad">
+      <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 Q720,150 1440,0 L1440,90 L0,90 Z"/></svg>
+      <div class="wrap feature">
+        <div class="embed feature-media reveal" id="live-video" data-youtube="ytjkJg3s7XE" data-title="I Got a Woman (Ray Charles cover) — Gringo's Washboard Band">
+          <img src="https://i.ytimg.com/vi/ytjkJg3s7XE/maxresdefault.jpg" alt="Video still: I Got a Woman (Ray Charles cover)" loading="lazy">
+          <div class="embed-bar"><span class="dot"></span>Gringo's Washboard Band — I Got a Woman (Ray Charles cover)</div>
+          <button class="embed-play" type="button" aria-label="Watch video: I Got a Woman (Ray Charles cover)"><i class="fa-solid fa-play"></i></button>
+        </div>
+        <div class="feature-text reveal">
+          <h3>Live at the Washhouse</h3>
+          <p>
+            Recorded in a single take in a 19th-century public washhouse in Lisbon: twelve songs, five musicians, zero overdubs and one very confused caretaker.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Agenda (gold) ===== -->
+    <section class="section section--gold section-pad" id="tour">
+      <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,90 Q720,-30 1440,90 Z"/></svg>
+      <div class="wrap">
+        <h2 class="section-title reveal">Tour Dates</h2>
+        <picture><source srcset="../images/agenda.avif" type="image/avif"><source srcset="../images/agenda.webp" type="image/webp"><img class="tour-poster fx-inout reveal" src="../images/agenda.jpg" alt="Rub-a-Dub Tour 2026 poster" width="1100" height="620"></picture>
+        <p class="tour-follow"><a href="#">Follow</a> the band for news about gigs and live streams.</p>
+        <div class="tour-tabs" role="tablist">
+          <button type="button" class="is-active" data-mode="upcoming" role="tab">Upcoming Dates</button>
+          <button type="button" data-mode="past" role="tab">Past Dates</button>
+        </div>
+        <ul class="tour-list">
+          <li data-when="upcoming">
+            <span class="date">Fri, 6 Nov</span>
+            <a class="venue" href="#">Rub-a-Dub Blues Release Party</a>
+            <span class="city">Lisbon, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Sat, 7 Nov</span>
+            <a class="venue" href="#">Hot Club de Portugal</a>
+            <span class="city">Lisbon, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Thu, 12 Nov</span>
+            <a class="venue" href="#">Casa da Música — Room 2</a>
+            <span class="city">Porto, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Fri, 13 Nov</span>
+            <a class="venue" href="#">Salão Brazil</a>
+            <span class="city">Coimbra, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Sat, 14 Nov</span>
+            <a class="venue" href="#">Theatro Circo</a>
+            <span class="city">Braga, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Thu, 19 Nov</span>
+            <a class="venue" href="#">Café Berlin</a>
+            <span class="city">Madrid, ES</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Fri, 20 Nov</span>
+            <a class="venue" href="#">Jamboree Jazz Club</a>
+            <span class="city">Barcelona, ES</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Sat, 21 Nov</span>
+            <a class="venue" href="#">Le Caveau de la Huchette</a>
+            <span class="city">Paris, FR</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Tue, 24 Nov</span>
+            <a class="venue" href="#">Paradiso — Small Hall</a>
+            <span class="city">Amsterdam, NL</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Thu, 26 Nov</span>
+            <a class="venue" href="#">The Jazz Café</a>
+            <span class="city">London, UK</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">Sat, 5 Dec</span>
+            <a class="venue" href="#">Washboard Winter Festival</a>
+            <span class="city">Ghent, BE</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="upcoming">
+            <span class="date">30 Dec – 2 Jan 2027</span>
+            <a class="venue" href="#">New Year's Swing Cruise</a>
+            <span class="city">Lisbon → Funchal</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="past">
+            <span class="date">Sat, 12 Sep</span>
+            <a class="venue" href="#">Festa do Avante — Arraial Stage</a>
+            <span class="city">Seixal, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="past">
+            <span class="date">Sat, 8 Aug</span>
+            <a class="venue" href="#">Festival Sons de Vez</a>
+            <span class="city">Arcos de Valdevez, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+          <li data-when="past">
+            <span class="date">Fri, 17 Jul</span>
+            <a class="venue" href="#">Blues in the Park</a>
+            <span class="city">Évora, PT</span>
+            <a class="btn btn--ticket fx-tada" href="#">Info</a>
+          </li>
+        </ul>
+        <button class="btn btn--outline tour-more" type="button">See all dates</button>
+      </div>
+    </section>
+
+    <!-- ===== Album (aqua) ===== -->
+    <section class="section section--aqua section-pad album" id="music-new">
+      <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 Q720,150 1440,0 L1440,90 L0,90 Z"/></svg>
+      <div class="wrap">
+        <h2 class="album-heading reveal">New Album Out Now!<br>Hear It, Spin It, Scrub It</h2>
+        <img class="album-cover fx-inout reveal" src="https://placehold.co/600x600/1b1310/e5bf5e?text=Rub-a-Dub+Blues&font=oswald" alt="Album cover: Rub-a-Dub Blues" width="600" height="600">
+        <div class="album-actions reveal">
+          <a class="btn btn--black fx-tada" href="#">Stream or<br>Download</a>
+          <a class="btn btn--black fx-tada" href="#">Vinyl &amp;<br>Signed Copies</a>
+        </div>
+
+        <div class="reviews" aria-roledescription="carousel" aria-label="Press reviews">
+          <button class="reviews-arrow reviews-arrow--prev" type="button" aria-label="Previous review"><i class="fa-solid fa-chevron-left"></i></button>
+          <div class="reviews-track" aria-live="polite">
+          <figure class="review is-active">
+            <blockquote>&ldquo;Four musicians, one washboard and enough swing to rattle the windows of every bar in town.&rdquo; &#9733;&#9733;&#9733;&#9733;</blockquote>
+            <figcaption><cite>Rootsy Monthly</cite></figcaption>
+          </figure>
+          <figure class="review">
+            <blockquote>&ldquo;The happiest noise you'll hear all year — hokum blues played like it's a matter of life and death.&rdquo; &#9733;&#9733;&#9733;&#9733;</blockquote>
+            <figcaption><cite>The Porch Review</cite></figcaption>
+          </figure>
+          <figure class="review">
+            <blockquote>&ldquo;Thimbles on tin have never sounded so sophisticated. Or so much fun.&rdquo; &#9733;&#9733;&#9733;&#9733;</blockquote>
+            <figcaption><cite>Jug & String Magazine</cite></figcaption>
+          </figure>
+          <figure class="review">
+            <blockquote>&ldquo;A record that smells of sawdust, cheap wine and 1929. We mean that as the highest compliment.&rdquo; &#9733;&#9733;&#9733;&#9733;</blockquote>
+            <figcaption><cite>Blue Note Weekly</cite></figcaption>
+          </figure>
+          <figure class="review">
+            <blockquote>&ldquo;Live, they're unstoppable. On record, they're almost as dangerous.&rdquo; &#9733;&#9733;&#9733;&#9733;</blockquote>
+            <figcaption><cite>Lisbon Sound Journal</cite></figcaption>
+          </figure>
+          <figure class="review">
+            <blockquote>&ldquo;Ragtime, swing and pure mischief. Rub-a-Dub Blues is a joy from start to finish.&rdquo; &#9733;&#9733;&#9733;&#9733;</blockquote>
+            <figcaption><cite>Folk Alley Review</cite></figcaption>
+          </figure>
+          </div>
+          <button class="reviews-arrow reviews-arrow--next" type="button" aria-label="Next review"><i class="fa-solid fa-chevron-right"></i></button>
+          <div class="reviews-dots"></div>
+        </div>
+
+        <div class="video-row reveal">
+          <a class="video-thumb" href="#" aria-label="Watch video: Rub-a-Dub Blues (Official Video)"><img src="https://placehold.co/640x360/2a1d18/e5bf5e?text=Rub-a-Dub+Blues+%28V%C3%ADdeo+Oficial%29&font=oswald" alt="Video still: Rub-a-Dub Blues (Official Video)" loading="lazy"></a>
+          <a class="video-thumb" href="#" aria-label="Watch video: Scrub Me Mama — Live"><img src="https://placehold.co/640x360/2a1d18/e5bf5e?text=Scrub+Me+Mama+%E2%80%94+Ao+Vivo&font=oswald" alt="Video still: Scrub Me Mama — Live" loading="lazy"></a>
+          <a class="video-thumb" href="#" aria-label="Watch video: Making of the Album"><img src="https://placehold.co/640x360/2a1d18/e5bf5e?text=Making+of+do+%C3%81lbum&font=oswald" alt="Video still: Making of the Album" loading="lazy"></a>
+          <a class="video-thumb" href="#" aria-label="Watch video: Thimble Stomp (Lyric Video)"><img src="https://placehold.co/640x360/2a1d18/e5bf5e?text=Thimble+Stomp+%28V%C3%ADdeo+com+Letra%29&font=oswald" alt="Video still: Thimble Stomp (Lyric Video)" loading="lazy"></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="site-footer section--black" id="contact">
+    <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,90 Q720,-30 1440,90 Z"/></svg>
+    <div class="wrap">
+      <div class="footer-top">
+        <div>
+          <h4>The Gringo's Newsletter</h4>
+          <p>Sign up for news about new music, gigs and the occasional washboard mishap.</p>
+          <form class="newsletter" novalidate>
+            <div class="row">
+              <label class="visually-hidden" for="nl-name">First name</label>
+              <input id="nl-name" type="text" name="name" placeholder="Name" autocomplete="given-name">
+              <label class="visually-hidden" for="nl-email">Email</label>
+              <input id="nl-email" type="email" name="email" placeholder="Your email" autocomplete="email" required>
+            </div>
+            <button class="btn btn--gold" type="submit">Subscribe for updates</button>
+            <p class="newsletter-msg" role="status"></p>
+          </form>
+        </div>
+        <div class="contact-card">
+          <div>
+            <i class="fa-regular fa-envelope"></i>
+            <p><strong>Email</strong>
+              <a href="mailto:contato@gringoswashboard.com.br">contato@gringoswashboard.com.br</a></p>
+          </div>
+          <div>
+            <i class="fa-solid fa-phone"></i>
+            <p><strong>Phone</strong>
+              <a href="tel:+351913706750">+351 913 706 750</a></p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-nav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#band">About</a></li>
+          <li><a href="index.html#videos">Media</a></li>
+          <li><a href="index.html#tour">Tour</a></li>
+          <li><a href="../index.html" lang="pt-PT" hreflang="pt-PT">Português <img class="flag" src="../images/flag-pt.svg" alt="" width="24" height="12"></a></li>
+        </ul>
+        <ul class="social">
+          <li><a class="fx-tada" href="https://www.facebook.com/gringoswashboard" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a></li>
+          <li><a class="fx-tada" href="https://www.instagram.com/gringoswb" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+          <li><a class="fx-tada" href="https://www.youtube.com/gringoswashboard" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></li>
+        </ul>
+      </div>
+      <div class="footer-legal"><a href="#">Privacy Policy</a><a href="#">Cookie Policy</a></div>
+      <p class="copyright">&copy;<span data-year>2026</span> Designed by <a href="https://ricardoquintas.com/" target="_blank" rel="noopener">Ricardo Quintas</a></p>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

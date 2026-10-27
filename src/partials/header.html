@@ -18,12 +18,13 @@
    
    October/2026
 -->
-<html lang="pt-PT">
+<html lang="{{#lang pt}}pt-PT{{/lang}}{{#lang en}}en{{/lang}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{titulo}}</title>
   <meta name="description" content="{{descricao}}">
+  <!-- @hreflang -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Catamaran:wght@400;700&family=Oswald:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
@@ -34,12 +35,12 @@
 
   <!-- ===== Header ===== -->
   <header class="site-header">
-    <a class="logo" href="index.html" aria-label="Gringo's Washboard Band — início">
+    <a class="logo" href="index.html" aria-label="Gringo's Washboard Band — {{#lang pt}}início{{/lang}}{{#lang en}}home{{/lang}}">
       <img src="images/logo.jpg" alt="" width="100" height="100">
     </a>
     <div class="header-right">
       <!-- @social -->
-      <button class="burger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
+      <button class="burger" type="button" aria-label="{{#lang pt}}Abrir menu{{/lang}}{{#lang en}}Open menu{{/lang}}" aria-expanded="false" aria-controls="menu">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -47,15 +48,15 @@
 
   <!-- ===== Fullscreen menu ===== -->
   <div class="menu" id="menu" aria-hidden="true">
-    <button class="menu-close" type="button" aria-label="Fechar menu">&times;</button>
-    <nav aria-label="Principal">
+    <button class="menu-close" type="button" aria-label="{{#lang pt}}Fechar menu{{/lang}}{{#lang en}}Close menu{{/lang}}">&times;</button>
+    <nav aria-label="{{#lang pt}}Principal{{/lang}}{{#lang en}}Main{{/lang}}">
       <ul>
-        <li><a href="index.html">Início</a></li>
-        <li><a href="index.html#band">Sobre</a></li>
-        <li><a href="index.html#videos">Média</a></li>
-        <li><a href="index.html#tour">Agenda</a></li>
-        <li><a href="#" lang="en">English <img class="flag" src="images/flag-uk.svg" alt="" width="24" height="12"></a></li>
-        <li><a href="#contact">Contacto</a></li>
+        <li><a href="index.html">{{#lang pt}}Início{{/lang}}{{#lang en}}Home{{/lang}}</a></li>
+        <li><a href="index.html#band">{{#lang pt}}Sobre{{/lang}}{{#lang en}}About{{/lang}}</a></li>
+        <li><a href="index.html#videos">{{#lang pt}}Média{{/lang}}{{#lang en}}Media{{/lang}}</a></li>
+        <li><a href="index.html#tour">{{#lang pt}}Agenda{{/lang}}{{#lang en}}Tour{{/lang}}</a></li>
+        <li><!-- @idioma --></li>
+        <li><a href="#contact">{{#lang pt}}Contacto{{/lang}}{{#lang en}}Contact{{/lang}}</a></li>
       </ul>
       <!-- @social -->
     </nav>
