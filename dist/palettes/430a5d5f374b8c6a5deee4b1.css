@@ -1,0 +1,27 @@
+/* Paleta 430a5d5f374b8c6a5deee4b1 — gerada pelo build.js a partir de conteudo/paletas.yaml; não editar.
+   https://colorhunt.co/palette/430a5d5f374b8c6a5deee4b1
+   Contrastes: texto/rust 9.8, texto/gold 11.4, texto/grey 4.8, texto/aqua 14.6,
+   gold/escuro 11.4, ticket-red/gold 11.4, branco/ticket-red 14.6, menu/escuro 14.6. */
+:root {
+  --black: #430a5d;
+  --text: #430a5d;
+  --rust: #5f374b;
+  --gold: #eee4b1;
+  --gold-hot: #eee4b1;
+  --ticket-red: #430a5d;
+  --grey-light: #8c6a5d;
+  --aqua: #430a5d;
+  --card-dark: #56236d;
+}
+.section--rust { color: #ffffff; }
+.section--gold { color: #430a5d; }
+.section--grey { color: #ffffff; }
+.section--aqua { color: #ffffff; }
+.hero, .evento-hero { background: #430a5d; }
+.page-light { background: #f8f4e0; }
+.pullquote { color: #eee4b1; }
+.menu nav a { color: #ffffff; }
+.card h2 a:hover, .meta a:hover, .read-more:hover, .post .contacts a:hover, .post.evento .meta i,
+.evento-dados i, .evento-dados a:hover, .post.legal a:hover { color: #5f374b; }
+.epk-cols > div + div { border-left-color: currentColor; }
+@media (max-width: 900px) { .tour-list .city { color: inherit; } }

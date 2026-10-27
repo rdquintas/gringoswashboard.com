@@ -60,6 +60,9 @@ const REDES = {
   soundcloud: ['SoundCloud', 'fa-soundcloud'],
   bandcamp: ['Bandcamp', 'fa-bandcamp'],
 };
+// Paletas de cores alternativas (conteudo/paletas.yaml): contraste mínimo (WCAG) para texto
+// normal e para texto grande/ícones, e o do fundo escuro (header, menu, footer) com o branco.
+const PALETA = { texto: 4.5, grande: 3, escuro: 14 };
 // Formatos gerados, pela ordem de preferência nos <source> do <picture>.
 const FORMATOS = [
   { ext: 'avif', type: 'image/avif', opcoes: { quality: 50, effort: 4 } },
@@ -233,6 +236,134 @@ function usarPicture(html) {
       `<source srcset="${src[1].replace(IMG_CONVERTIVEIS, '.' + ext)}" type="${type}">`);
     return `<picture>${sources.join('')}${img}</picture>`;
   });
+}
+
+// Cores das paletas: [r, g, b] de 0 a 255.
+const BRANCO = [255, 255, 255];
+const PRETO = [0, 0, 0];
+const corRgb = (hex) => [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const corHex = (c) => '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+const luminancia = (c) => {
+  const [r, g, b] = c.map((v) => ((v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contraste = (a, b) => {
+  const [claro, escuro] = [luminancia(a), luminancia(b)].sort((x, y) => y - x);
+  return (claro + 0.05) / (escuro + 0.05);
+};
+const misturar = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+// Intensidade da cor (0 = cinzento, 1 = pura); ao contrário da saturação HSL, os tons pastel ficam baixos.
+const croma = (c) => (Math.max(...c) - Math.min(...c)) / 255;
+// Escurece `cor` (para o preto, aos poucos) até ter pelo menos `min` de contraste com cada fundo.
+const escurecer = (cor, fundos, min) => {
+  for (let k = 0; k <= 20; k++) {
+    const c = misturar(cor, PRETO, k / 20);
+    if (fundos.every((f) => contraste(c, f) >= min)) return c;
+  }
+  return PRETO;
+};
+const permutacoes = (lista) => (lista.length <= 1 ? [lista]
+  : lista.flatMap((x, i) => permutacoes([...lista.slice(0, i), ...lista.slice(i + 1)]).map((p) => [x, ...p])));
+
+// CSS de uma paleta de 4 cores: redefine as variáveis do style.css (e algumas regras onde a cor
+// do texto tem de mudar), com cada cor no papel em que fica mais legível. As cores das secções
+// (--rust, --gold, --grey-light, --aqua) são as 4 da paleta, pela combinação com mais pontos:
+// contraste do texto de cada secção, do dourado (destaques, botões) sobre o fundo escuro, secções
+// seguidas bem distintas, --rust escura (texto claro), --gold viva e --grey-light clara. O fundo
+// escuro é a cor mais escura, escurecida até PALETA.escuro de contraste com o branco.
+function cssPaleta(id) {
+  const cores = id.match(/.{6}/g).map(corRgb);
+  const escuro = escurecer([...cores].sort((a, b) => luminancia(a) - luminancia(b))[0], [BRANCO], PALETA.escuro);
+  const texto = (fundo) => (contraste(escuro, fundo) >= contraste(BRANCO, fundo) ? escuro : BRANCO);
+  // Acima de 7 (AAA) mais contraste já não conta.
+  const pontos = (c, min) => Math.min(c, 7) - (c < min ? 20 : 0);
+  const [, rust, gold, grey, aqua] = permutacoes(cores).map(([rust, gold, grey, aqua]) => {
+    let p = [rust, gold, grey, aqua].reduce((s, f) => s + pontos(contraste(texto(f), f), PALETA.texto), 0);
+    p += pontos(contraste(gold, escuro), PALETA.texto);
+    // Ordem das secções: rust, gold, grey, aqua, gold (EPK).
+    p += [[rust, gold], [gold, grey], [grey, aqua], [aqua, gold]].reduce((s, [a, b]) => s + Math.min(contraste(a, b), 3), 0);
+    p += (texto(rust) === BRANCO ? 4 : 0) + croma(gold) * 6 + luminancia(grey) * 2;
+    return [p, rust, gold, grey, aqua];
+  }).sort((a, b) => b[0] - a[0])[0]
+    // Uma secção cujo texto fique abaixo de PALETA.texto é ajustada o mínimo possível (escurecida
+    // com texto claro, clareada com texto escuro).
+    .map((f, i) => {
+      if (i === 0 || contraste(texto(f), f) >= PALETA.texto) return f;
+      const alvo = texto(f) === BRANCO ? PRETO : BRANCO;
+      for (let k = 1; k <= 20; k++) {
+        const c = misturar(f, alvo, k / 40);
+        if (contraste(texto(c), c) >= PALETA.texto) return c;
+      }
+      return f;
+    });
+
+  // --ticket-red: texto sobre a secção dourada (agenda, especificações) e fundo do botão de
+  // bilhetes (texto branco). A cor da paleta (ou o escuro) com mais contraste com os dois,
+  // escurecida se não chegar.
+  const fundosAcento = [gold, BRANCO];
+  const minAcento = (c) => Math.min(...fundosAcento.map((f) => contraste(c, f)));
+  const acento = escurecer([...cores.filter((c) => c !== gold), escuro]
+    .sort((a, b) => minAcento(b) - minAcento(a))[0], fundosAcento, PALETA.texto);
+  // --rust também é a cor dos links do menu (sobre o escuro) e de ícones/hovers nas páginas
+  // brancas (imprensa, concertos, legais): onde não tiver contraste, fica outra cor.
+  const menu = [rust, aqua, grey, BRANCO].find((c) => contraste(c, escuro) >= PALETA.texto) ?? BRANCO;
+  const sobreBranco = contraste(rust, BRANCO) >= PALETA.grande ? rust : acento;
+  const citacao = contraste(gold, rust) >= PALETA.grande ? gold : texto(rust);
+
+  const h = corHex;
+  const c = (a, b) => contraste(a, b).toFixed(1);
+  return [
+    `/* Paleta ${id} — gerada pelo build.js a partir de conteudo/paletas.yaml; não editar.`,
+    `   https://colorhunt.co/palette/${id}`,
+    `   Contrastes: texto/rust ${c(texto(rust), rust)}, texto/gold ${c(texto(gold), gold)}, texto/grey ${c(texto(grey), grey)}, texto/aqua ${c(texto(aqua), aqua)},`,
+    `   gold/escuro ${c(gold, escuro)}, ticket-red/gold ${c(acento, gold)}, branco/ticket-red ${c(BRANCO, acento)}, menu/escuro ${c(menu, escuro)}. */`,
+    ':root {',
+    `  --black: ${h(escuro)};`,
+    `  --text: ${h(escuro)};`,
+    `  --rust: ${h(rust)};`,
+    `  --gold: ${h(gold)};`,
+    `  --gold-hot: ${h(gold)};`,
+    `  --ticket-red: ${h(acento)};`,
+    `  --grey-light: ${h(grey)};`,
+    `  --aqua: ${h(aqua)};`,
+    `  --card-dark: ${h(misturar(escuro, BRANCO, 0.1))};`,
+    '}',
+    `.section--rust { color: ${h(texto(rust))}; }`,
+    `.section--gold { color: ${h(texto(gold))}; }`,
+    `.section--grey { color: ${h(texto(grey))}; }`,
+    `.section--aqua { color: ${h(texto(aqua))}; }`,
+    `.hero, .evento-hero { background: ${h(escuro)}; }`,
+    `.page-light { background: ${h(misturar([...cores].sort((a, b) => luminancia(b) - luminancia(a))[0], BRANCO, 0.6))}; }`,
+    `.pullquote { color: ${h(citacao)}; }`,
+    `.menu nav a { color: ${h(menu)}; }`,
+    `.card h2 a:hover, .meta a:hover, .read-more:hover, .post .contacts a:hover, .post.evento .meta i,`,
+    `.evento-dados i, .evento-dados a:hover, .post.legal a:hover { color: ${h(sobreBranco)}; }`,
+    '.epk-cols > div + div { border-left-color: currentColor; }',
+    '@media (max-width: 900px) { .tour-list .city { color: inherit; } }',
+    '',
+  ].join('\n');
+}
+
+// Paletas (conteudo/paletas.yaml, IDs ou links do colorhunt.co): gera dist/palettes/<id>.css e
+// a lista de IDs (com a versão de cada CSS) no `/* @paletas */` do js/palette.js. Devolve os IDs.
+function gerarPaletas() {
+  const ficheiro = path.join(CONTEUDO, 'paletas.yaml');
+  const lista = fs.existsSync(ficheiro) ? lerYaml(ficheiro).paletas ?? [] : [];
+  if (!Array.isArray(lista)) throw new Error('paletas.yaml: `paletas` tem de ser uma lista');
+  const ids = [...new Set(lista.map((item) => {
+    const id = String(item).trim().toLowerCase().replace(/^.*\/palette\//, '').replace(/[#\s-]/g, '');
+    if (!/^[0-9a-f]{24}$/.test(id)) throw new Error(`paletas.yaml: paleta inválida (4 cores hex, ex.: ff6082ffe4f6b26cff705eff): ${item}`);
+    return id;
+  }))];
+  fs.mkdirSync(path.join(DIST, 'palettes'), { recursive: true });
+  const versoes = Object.fromEntries(ids.map((id) => {
+    const css = cssPaleta(id);
+    fs.writeFileSync(path.join(DIST, 'palettes', `${id}.css`), css);
+    return [id, crypto.createHash('sha256').update(css).digest('hex').slice(0, 10)];
+  }));
+  const js = path.join(DIST, 'js', 'palette.js');
+  fs.writeFileSync(js, substituirMarcador(fs.readFileSync(js, 'utf8'), /\/\* @paletas \*\/ \{\}/, JSON.stringify(versoes), 'js/palette.js'));
+  return ids;
 }
 
 async function main() {
@@ -471,9 +602,11 @@ async function main() {
   if (gaId && !/^G-[A-Z0-9]+$/.test(gaId)) throw new Error(`site.yaml: \`google_analytics_id\` tem de ser um ID do GA4 (G-XXXXXXXXXX): ${gaId}`);
   const metaAnalytics = (_, indent) => (gaId ? `${indent}<meta name="ga-id" content="${gaId}">\n` : '');
 
-  // Cache busting: os links para css/style.css e js/main.js levam `?v=<hash do conteúdo>`, para
-  // os browsers não usarem uma versão antiga em cache depois de um deploy.
-  const versoes = ['css/style.css', 'js/main.js'].map((recurso) => {
+  const paletas = gerarPaletas();
+
+  // Cache busting: os links para css/style.css, js/main.js e js/palette.js levam
+  // `?v=<hash do conteúdo>`, para os browsers não usarem uma versão antiga em cache depois de um deploy.
+  const versoes = ['css/style.css', 'js/main.js', 'js/palette.js'].map((recurso) => {
     const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(DIST, recurso))).digest('hex').slice(0, 10);
     return [recurso, `${recurso}?v=${hash}`];
   });
@@ -587,6 +720,7 @@ async function main() {
     `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
   console.log(`Build concluído: src/ → dist/ (${paginas.length} páginas e ${eventos.length} de concertos em ${Object.keys(LINGUAS).join(', ')}; ${imagens.total} imagens em AVIF/WebP, ${imagens.convertidas} conversões novas, ${ogNovas} de partilha novas; sitemap com ${urls.length} URLs, robots.txt)`);
+  paletas.forEach((id) => console.log(`Paleta ${id}: ${SITE_URL}?palete_id=${id}`));
 }
 
 main().catch((err) => {

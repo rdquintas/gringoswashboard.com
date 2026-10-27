@@ -41,5 +41,11 @@ npm run dev          # build + serve dist em http://localhost:3000/
 - O GA só é carregado depois de o visitante aceitar no aviso de cookies (fundo do ecrã). A escolha fica guardada no browser e pode ser mudada em "Preferências de cookies", no footer ou na página da política de cookies.
 - Páginas legais: `src/privacidade.html` e `src/politica-cookies.html` (pt e en). Ao mudar o que o site recolhe (ex.: newsletter real, novos serviços externos), rever o texto e a data de atualização.
 
+## Paletas de cores (experimentação)
+- Em `src/conteudo/paletas.yaml`, acrescentar à lista `paletas` o ID de uma paleta do [colorhunt.co](https://colorhunt.co/) (as 4 cores seguidas, sem `#`, ex.: `ff6082ffe4f6b26cff705eff`) ou o link dela.
+- O `npm run build` gera `dist/palettes/<id>.css` e escreve no fim o URL para a ver: `…/dist/?palete_id=<id>` (funciona em qualquer página e em inglês; os links internos mantêm o parâmetro).
+- O build escolhe sozinho o papel de cada cor (fundo de cada secção, destaques, botões) para o texto ficar legível (contraste ≥ 4,5); o fundo escuro do header/footer é a cor mais escura da paleta, escurecida. Os contrastes ficam no comentário do topo de cada CSS.
+- Sem o parâmetro (ou com um ID que não esteja no YAML), o site fica com as cores originais do `style.css`.
+
 ## Notas
 - Segurança: cabeçalhos e CSP no `netlify.toml`. A CSP só permite recursos do próprio domínio e **não permite scripts nem estilos inline**: quando se acrescentar CSS/JS, vai em ficheiros. Qualquer domínio externo novo tem de ser acrescentado à CSP.

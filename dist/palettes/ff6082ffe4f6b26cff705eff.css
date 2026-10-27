@@ -1,0 +1,27 @@
+/* Paleta ff6082ffe4f6b26cff705eff — gerada pelo build.js a partir de conteudo/paletas.yaml; não editar.
+   https://colorhunt.co/palette/ff6082ffe4f6b26cff705eff
+   Contrastes: texto/rust 4.6, texto/gold 5.0, texto/grey 12.2, texto/aqua 4.6,
+   gold/escuro 5.0, ticket-red/gold 5.0, branco/ticket-red 14.5, menu/escuro 4.6. */
+:root {
+  --black: #272159;
+  --text: #272159;
+  --rust: #6d5cf9;
+  --gold: #ff6082;
+  --gold-hot: #ff6082;
+  --ticket-red: #272159;
+  --grey-light: #ffe4f6;
+  --aqua: #b470ff;
+  --card-dark: #3d376a;
+}
+.section--rust { color: #ffffff; }
+.section--gold { color: #272159; }
+.section--grey { color: #272159; }
+.section--aqua { color: #272159; }
+.hero, .evento-hero { background: #272159; }
+.page-light { background: #fff4fb; }
+.pullquote { color: #ffffff; }
+.menu nav a { color: #b470ff; }
+.card h2 a:hover, .meta a:hover, .read-more:hover, .post .contacts a:hover, .post.evento .meta i,
+.evento-dados i, .evento-dados a:hover, .post.legal a:hover { color: #6d5cf9; }
+.epk-cols > div + div { border-left-color: currentColor; }
+@media (max-width: 900px) { .tour-list .city { color: inherit; } }

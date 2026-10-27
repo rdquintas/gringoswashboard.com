@@ -1,0 +1,12 @@
+# Paletas de cores alternativas, para experimentar (ver README, "Paletas de cores").
+# Cada item é o ID de uma paleta do colorhunt.co (as 4 cores seguidas, sem #) ou o link dela,
+# ex.: https://colorhunt.co/palette/ff6082ffe4f6b26cff705eff
+# O build gera dist/palettes/<id>.css e escreve o URL para a ver: <site>?palete_id=<id>.
+paletas:
+  - ff6082ffe4f6b26cff705eff
+  - 4f7d32ffd16af5b52ed9361e
+  - d90000ffea938db355000000
+  - fe7743efeeea273f4f000000
+  - 000000830000bc0202ff0000
+  - 0c0c0c481e149b3922f2613f
+  - 430a5d5f374b8c6a5deee4b1
