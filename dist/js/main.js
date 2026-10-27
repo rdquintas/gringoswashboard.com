@@ -87,75 +87,25 @@
     el.addEventListener("animationend", function () { el.classList.remove("is-tada"); });
   });
 
-  /* ---------- Review slider ---------- */
-  var slider = document.querySelector(".reviews");
-  if (slider) {
-    var slides = slider.querySelectorAll(".review");
-    var dotsWrap = slider.querySelector(".reviews-dots");
-    var current = 0;
-    var timer = null;
-
-    slides.forEach(function (_, i) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.setAttribute("aria-label", t("Ver crítica ", "Show review ") + (i + 1));
-      b.addEventListener("click", function () { go(i); restart(); });
-      dotsWrap.appendChild(b);
-    });
-    var dots = dotsWrap.querySelectorAll("button");
-
-    function go(i) {
-      current = (i + slides.length) % slides.length;
-      slides.forEach(function (s, n) { s.classList.toggle("is-active", n === current); });
-      dots.forEach(function (d, n) { d.classList.toggle("is-active", n === current); });
-    }
-    function restart() {
-      clearInterval(timer);
-      if (!reduceMotion) timer = setInterval(function () { go(current + 1); }, 5000);
-    }
-    slider.querySelector(".reviews-arrow--prev").addEventListener("click", function () { go(current - 1); restart(); });
-    slider.querySelector(".reviews-arrow--next").addEventListener("click", function () { go(current + 1); restart(); });
-    slider.addEventListener("mouseenter", function () { clearInterval(timer); });
-    slider.addEventListener("mouseleave", restart);
-    go(0);
-    restart();
-  }
-
-  /* ---------- Tour: tabs + show all ---------- */
+  /* ---------- Tour: tabs ---------- */
   var tour = document.querySelector(".tour-list");
   if (tour) {
-    var VISIBLE = 8;
-    var moreBtn = document.querySelector(".tour-more");
     var tabs = document.querySelectorAll(".tour-tabs button");
-    var expanded = false;
     var mode = "upcoming";
 
     function renderTour() {
-      var rows = tour.querySelectorAll("li");
-      var shown = 0;
-      var total = 0;
-      rows.forEach(function (li) {
-        var match = li.dataset.when === mode;
-        if (match) total++;
-        var show = match && (expanded || shown < VISIBLE);
-        if (show) shown++;
-        li.classList.toggle("is-hidden", !show);
+      tour.querySelectorAll("li").forEach(function (li) {
+        li.classList.toggle("is-hidden", li.dataset.when !== mode);
         li.classList.toggle("is-past", li.dataset.when === "past");
       });
-      if (moreBtn) {
-        moreBtn.hidden = total <= VISIBLE;
-        moreBtn.textContent = expanded ? t("Ver menos datas", "See fewer dates") : t("Ver todas as datas", "See all dates");
-      }
     }
     tabs.forEach(function (t) {
       t.addEventListener("click", function () {
         mode = t.dataset.mode;
-        expanded = false;
         tabs.forEach(function (x) { x.classList.toggle("is-active", x === t); });
         renderTour();
       });
     });
-    if (moreBtn) moreBtn.addEventListener("click", function () { expanded = !expanded; renderTour(); });
     // Toda a linha é clicável: um clique fora dos links segue o link do local
     tour.addEventListener("click", function (e) {
       if (e.target.closest("a, button") || String(window.getSelection())) return;

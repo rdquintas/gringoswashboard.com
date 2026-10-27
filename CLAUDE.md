@@ -6,7 +6,7 @@ Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens d
 
 ## Estado atual
 
-Site de uma página (`index.html`) com secções (hero, álbum + reviews, agenda, live session, música, a banda, footer com newsletter) e duas páginas de imprensa (`press.html`, `press-post.html`). HTML escrito à mão, **sem templates nem framework**; o build copia `src/` → `dist/`, inclui os partials comuns (header/menu e footer) e preenche alguns marcadores a partir de `src/conteudo/home.yaml`. Única dependência: `sharp` (devDependency, conversão de imagens); sem testes nem linter: validar correndo `npm run build`.
+Site de uma página (`index.html`) com secções (hero, agenda, live session, música, a banda, footer com newsletter) e duas páginas de imprensa (`press.html`, `press-post.html`). HTML escrito à mão, **sem templates nem framework**; o build copia `src/` → `dist/`, inclui os partials comuns (header/menu e footer) e preenche alguns marcadores a partir de `src/conteudo/home.yaml`. Única dependência: `sharp` (devDependency, conversão de imagens); sem testes nem linter: validar correndo `npm run build`.
 
 Muitas imagens ainda são placeholders de `placehold.co`.
 
@@ -30,7 +30,7 @@ Node 22 (`.nvmrc`, `netlify.toml`).
   - `partials/` — HTML comum a todas as páginas: `header.html` (do `<!DOCTYPE>` ao `<body>`, com o `<head>` completo, + header + menu fullscreen) e `footer.html` (conteúdo do `<footer>`). O build substitui cada `<!-- @partial nome chave="valor" … -->` pelo `partials/nome.html`, com a indentação do marcador; cada `{{chave}}` do partial leva o valor do atributo (obrigatório; `{{chave?}}` é opcional e um `class=""` vazio é retirado). No header, acrescenta `aria-current="page"` ao link do menu cujo `href` é a própria página.
   - `index.html`, `press.html`, `press-post.html` — páginas que começam por `<!-- @partial header titulo="…" descricao="…" classe="…" -->` (`<title>`, meta description e classe opcional do `<body>`) e têm, dentro do `<footer>`, `<!-- @partial footer -->` (a tag `<footer>` fica na página porque varia: no index tem `section--black` e a curva SVG).
   - `css/style.css` — todos os estilos, organizados por secções (`/* ---------- Hero ---------- */`); cores e fontes como variáveis em `:root`.
-  - `js/main.js` — JS vanilla sem dependências (IIFE): menu fullscreen, reveal ao fazer scroll, efeitos "tada"/pulse, slider de reviews, tabs da agenda, newsletter (mock), ano no footer. Acrescenta a classe `js` ao `<html>`.
+  - `js/main.js` — JS vanilla sem dependências (IIFE): menu fullscreen, reveal ao fazer scroll, efeitos "tada"/pulse, tabs da agenda, newsletter (mock), ano no footer. Acrescenta a classe `js` ao `<html>`.
   - `images/` — `hero01–03.png` e `hero01–03_v.png` (slideshow do hero, horizontal 1920×900 e vertical 1080×1920), `band.jpg`, `musico01–05.png`.
 - **`dist/`** — gerado, mas **versionado** (o GitHub Pages serve-o e não corre build): correr `npm run build` e fazer commit de `dist/` junto com `src/`.
 - **`netlify.toml`** — `npm run build`, publica `dist`, Node 22, cabeçalhos de segurança.
