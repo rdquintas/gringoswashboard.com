@@ -284,6 +284,9 @@ button { font: inherit; cursor: pointer; }
 .contact-card strong { display: block; }
 .contact-card span, .contact-card a { color: #bbb; display: block; }
 .contact-card a:hover { color: var(--gold); }
+/* Botão do WhatsApp: por baixo do telefone (2.ª coluna). */
+.contact-card .contact-whatsapp { grid-column: 2; justify-self: start; display: block; }
+.contact-whatsapp img { width: 240px; height: auto; border-radius: 10px; }
 .footer-nav { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 18px; flex-wrap: wrap; gap: 10px; }
 .footer-nav ul { display: flex; gap: 22px; flex-wrap: wrap; }
 .footer-nav ul a { color: var(--gold); }
@@ -424,6 +427,7 @@ button { font: inherit; cursor: pointer; }
   .feature { grid-template-columns: 1fr; gap: 20px; }
   .covers-grid { grid-template-columns: repeat(3, 1fr); }
   .footer-top, .contact-card { grid-template-columns: minmax(0, 1fr); }
+  .contact-card .contact-whatsapp { grid-column: auto; }
   .newsletter .row { flex-direction: column; }
   .footer-nav { flex-direction: column; align-items: flex-start; }
   .tour-list li { grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 12px; }

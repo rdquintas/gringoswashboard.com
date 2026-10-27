@@ -41,8 +41,8 @@ const DATAS = {
 };
 // Textos da agenda e das páginas dos concertos gerados pelo build, por língua.
 const ROTULOS = {
-  pt: { bilhetes: 'Bilhetes', info: 'Informações', comprar: 'Comprar bilhetes', local: 'Local', mapa: 'Ver no mapa', voltar: 'Voltar à agenda' },
-  en: { bilhetes: 'Tickets', info: 'Info', comprar: 'Buy tickets', local: 'Venue', mapa: 'View on map', voltar: 'Back to tour dates' },
+  pt: { bilhetes: 'Bilhetes', info: 'Informações', comprar: 'Comprar bilhetes', local: 'Local', mapa: 'Ver no mapa', voltar: 'Voltar à agenda', whatsapp: 'Conversar no WhatsApp' },
+  en: { bilhetes: 'Tickets', info: 'Info', comprar: 'Buy tickets', local: 'Venue', mapa: 'View on map', voltar: 'Back to tour dates', whatsapp: 'Chat on WhatsApp' },
 };
 // Imagem de partilha (og:image) dos concertos: JPG com estas medidas, a partir de `imagem_v_4x5`.
 const OG = { largura: 1440, altura: 1800, qualidade: 85 };
@@ -442,6 +442,12 @@ async function main() {
   const telefone = String(site.contactos?.telefone ?? '').trim();
   if (!telefone) throw new Error('site.yaml: `contactos.telefone` tem de ter o telefone de contacto');
   const linkTelefone = `<a href="tel:${escapar(telefone.replace(/\s/g, ''))}">${escapar(telefone)}</a>`;
+  // `<!-- @whatsapp -->` (numa linha só): botão (images/whatsapp.png) que abre uma conversa no
+  // WhatsApp com o número de `contactos.whatsapp` (wa.me só aceita dígitos). Vazio: tira a linha.
+  const whatsapp = String(site.contactos?.whatsapp ?? '').trim().replace(/\D/g, '');
+  const botaoWhatsapp = (lingua) => (_, indent) => whatsapp
+    ? `${indent}<a class="contact-whatsapp fx-tada" href="https://wa.me/${whatsapp}" target="_blank" rel="noopener"><img src="images/whatsapp.png" alt="${ROTULOS[lingua].whatsapp}" width="300" height="300" loading="lazy"></a>\n`
+    : '';
 
   // Cache busting: os links para css/style.css e js/main.js levam `?v=<hash do conteúdo>`, para
   // os browsers não usarem uma versão antiga em cache depois de um deploy.
@@ -507,7 +513,8 @@ async function main() {
       .replace(/^([ \t]*)<!-- @og -->/gm, (_, indent) => ogTags(lingua, pagina, evento).map((l) => indent + l).join('\n'))
       .replace(/<!-- @idioma -->/g, idioma)
       .replace(/<!-- @email -->/g, linkEmail)
-      .replace(/<!-- @telefone -->/g, linkTelefone);
+      .replace(/<!-- @telefone -->/g, linkTelefone)
+      .replace(/^([ \t]*)<!-- @whatsapp -->\r?\n?/gm, botaoWhatsapp(lingua));
     html = usarPicture(versionar(html));
     if (nivel) html = subirCaminhos(html, nivel);
     fs.writeFileSync(path.join(DIST, pasta, pagina), html);
