@@ -87,24 +87,15 @@
     el.addEventListener("animationend", function () { el.classList.remove("is-tada"); });
   });
 
-  /* ---------- Tour: tabs ---------- */
+  /* ---------- Tour ---------- */
   var tour = document.querySelector(".tour-list");
   if (tour) {
-    var tabs = document.querySelectorAll(".tour-tabs button");
-    var mode = "upcoming";
-
-    function renderTour() {
-      tour.querySelectorAll("li").forEach(function (li) {
-        li.classList.toggle("is-hidden", li.dataset.when !== mode);
-        li.classList.toggle("is-past", li.dataset.when === "past");
-      });
-    }
-    tabs.forEach(function (t) {
-      t.addEventListener("click", function () {
-        mode = t.dataset.mode;
-        tabs.forEach(function (x) { x.classList.toggle("is-active", x === t); });
-        renderTour();
-      });
+    // O build só pôs os concertos futuros à data do build: tirar os que já passaram desde então
+    var hoje = new Date();
+    var hojeIso = [hoje.getFullYear(), hoje.getMonth() + 1, hoje.getDate()]
+      .map(function (n) { return String(n).padStart(2, "0"); }).join("-");
+    tour.querySelectorAll("li[data-date]").forEach(function (li) {
+      if (li.dataset.date < hojeIso) li.remove();
     });
     // Toda a linha é clicável: um clique fora dos links segue o link do local
     tour.addEventListener("click", function (e) {
@@ -113,7 +104,6 @@
       var venue = li && li.querySelector(".venue");
       if (venue) venue.click();
     });
-    renderTour();
   }
 
   /* ---------- "Records on the table": random tilt per cover ---------- */

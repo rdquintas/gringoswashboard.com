@@ -12,16 +12,40 @@ const SRC = path.join(__dirname, 'src');
 const DIST = path.join(__dirname, 'dist');
 const CONTEUDO = path.join(SRC, 'conteudo');
 const PARTIALS = path.join(SRC, 'partials');
+const MODELOS = path.join(SRC, 'modelos');
 const CACHE = path.join(__dirname, '.cache', 'images');
 const SITE_URL = 'https://gringoswashboard.com/';
 const HERO_FADE = 1.5; // segundos de crossfade entre imagens do hero
 const IMG_CONVERTIVEIS = /\.(png|jpe?g)$/i;
-// Línguas do site: pasta em dist/ (a primeira é a principal, na raiz), código para lang/hreflang
-// e nome e bandeira (em images/) do link para mudar de língua.
+// Línguas do site: pasta em dist/ (a primeira é a principal, na raiz), código para lang/hreflang,
+// locale do og:locale e nome e bandeira (em images/) do link para mudar de língua.
 const LINGUAS = {
-  pt: { pasta: '', codigo: 'pt-PT', nome: 'Português', bandeira: 'flag-pt.svg' },
-  en: { pasta: 'en/', codigo: 'en', nome: 'English', bandeira: 'flag-uk.svg' },
+  pt: { pasta: '', codigo: 'pt-PT', og: 'pt_PT', nome: 'Português', bandeira: 'flag-pt.svg' },
+  en: { pasta: 'en/', codigo: 'en', og: 'en_GB', nome: 'English', bandeira: 'flag-uk.svg' },
 };
+// Datas da agenda, por língua: dias da semana e meses abreviados para a lista (ex.: "Sex, 6 nov")
+// e locale para a data por extenso nas páginas dos concertos (ex.: "sábado, 21 de novembro de 2026").
+const DATAS = {
+  pt: {
+    dias: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+    meses: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
+    locale: 'pt-PT',
+  },
+  en: {
+    dias: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    meses: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    locale: 'en-GB',
+  },
+};
+// Textos da agenda e das páginas dos concertos gerados pelo build, por língua.
+const ROTULOS = {
+  pt: { bilhetes: 'Bilhetes', info: 'Informações', comprar: 'Comprar bilhetes', local: 'Local', mapa: 'Ver no mapa', voltar: 'Voltar à agenda' },
+  en: { bilhetes: 'Tickets', info: 'Info', comprar: 'Buy tickets', local: 'Venue', mapa: 'View on map', voltar: 'Back to tour dates' },
+};
+// Imagem de partilha (og:image) dos concertos: JPG com estas medidas, a partir de `imagem_v_4x5`.
+const OG = { largura: 1440, altura: 1800, qualidade: 85 };
+// Tamanho máximo do resumo de um concerto (meta description e og:description).
+const RESUMO_MAX = 200;
 // Redes aceites em `links` (redes sociais) do site.yaml: nome (aria-label) e ícone do Font
 // Awesome.
 const REDES = {
@@ -89,9 +113,10 @@ function lerYaml(ficheiro) {
   return dados;
 }
 
+// `conteudo` pode ser texto ou uma função de substituição (recebe o que o marcador apanhou).
 function substituirMarcador(texto, marcador, conteudo, onde) {
   if (!marcador.test(texto)) throw new Error(`Marcador ${marcador} não encontrado em ${onde}`);
-  return texto.replace(marcador, () => conteudo);
+  return texto.replace(marcador, typeof conteudo === 'function' ? conteudo : () => conteudo);
 }
 
 // Substitui cada `<!-- @partial nome chave="valor" … -->` pelo conteúdo de src/partials/nome.html,
@@ -162,6 +187,30 @@ async function converterImagens() {
   return { total: ficheiros.length, convertidas };
 }
 
+// Imagem de partilha de um concerto: `img` (de src/images/) em JPG OG.largura×OG.altura, cortada
+// ao centro e sem nada por cima, em dist/images/og/<slug>.jpg. A conversão fica em
+// .cache/images/og/ e só se refaz quando o original muda. Devolve true se converteu.
+async function imagemOg(img, slug) {
+  const origem = path.join(SRC, 'images', img);
+  const cache = path.join(CACHE, 'og', img.replace(IMG_CONVERTIVEIS, '.jpg'));
+  let convertida = false;
+  if (!fs.existsSync(cache) || fs.statSync(cache).mtimeMs < fs.statSync(origem).mtimeMs) {
+    fs.mkdirSync(path.dirname(cache), { recursive: true });
+    await sharp(origem).resize(OG.largura, OG.altura, { fit: 'cover' }).flatten({ background: '#ffffff' })
+      .jpeg({ quality: OG.qualidade, mozjpeg: true }).toFile(cache);
+    convertida = true;
+  }
+  fs.mkdirSync(path.join(DIST, 'images', 'og'), { recursive: true });
+  fs.copyFileSync(cache, path.join(DIST, 'images', 'og', `${slug}.jpg`));
+  return convertida;
+}
+
+// Slug para URLs: minúsculas, sem acentos, só letras, números e hífenes (ex.: "Hot Clube" → "hot-clube").
+function slugificar(texto) {
+  return String(texto).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
 // Envolve cada <img> de uma imagem local convertível num <picture> com <source> AVIF e WebP;
 // o <img> original fica como fallback para browsers sem suporte para esses formatos.
 function usarPicture(html) {
@@ -185,7 +234,7 @@ async function main() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.cpSync(SRC, DIST, {
     recursive: true,
-    filter: (f) => f !== CONTEUDO && f !== PARTIALS && !(path.dirname(f) === SRC && f.endsWith('.html')),
+    filter: (f) => f !== CONTEUDO && f !== PARTIALS && f !== MODELOS && !(path.dirname(f) === SRC && f.endsWith('.html')),
   });
 
   // Hero (`section_hero`): <img> a partir de `hero`, botões a partir de `cta1`/`cta2` e
@@ -219,6 +268,123 @@ async function main() {
         return `        <a class="btn ${classe}" href="${escapar(link)}">${escapar(texto)}</a>`;
       });
     return ctas.length ? `      <div class="hero-cta">\n${ctas.join('\n')}\n      </div>\n` : '';
+  };
+
+  // Agenda (`section_agenda.gigs`): cada concerto com `isEnabled: true` tem uma página própria em cada
+  // língua (`evento-<slug>.html`, slug a partir do `id`, gerada a partir de modelos/evento.html)
+  // e, se a data for de hoje em diante (data do build), um <li> na .tour-list do index, por ordem
+  // cronológica; o main.js tira, pelo `data-date`, os que entretanto passaram (à data do
+  // visitante). Os campos de texto podem ter versão inglesa com sufixo `_en` (ex.: `name_en`,
+  // `location_en`); sem ela, fica o texto em português.
+  const agenda = config.section_agenda?.gigs ?? [];
+  if (!Array.isArray(agenda)) throw new Error('home.yaml: `section_agenda.gigs` tem de ser uma lista de concertos');
+  const hoje = new Date();
+  const hojeIso = [hoje.getFullYear(), hoje.getMonth() + 1, hoje.getDate()].map((n) => String(n).padStart(2, '0')).join('-');
+  // Imagens por omissão (`section_agenda.default_images`): `hero` para os concertos sem
+  // `imagem_h` e `hero_v` para os sem `imagem_v_4x5` (também na imagem de partilha).
+  const imagensDefault = { imagem_h: 'hero', imagem_v_4x5: 'hero_v' };
+  Object.values(imagensDefault).forEach((chave) => {
+    const img = String(config.section_agenda?.default_images?.[chave] ?? '').trim();
+    if (!img) return;
+    if (!fs.existsSync(path.join(SRC, 'images', img))) throw new Error(`home.yaml: \`section_agenda.default_images.${chave}\`: imagem não existe: images/${img}`);
+    if (!IMG_CONVERTIVEIS.test(img)) throw new Error(`home.yaml: \`section_agenda.default_images.${chave}\` tem de ser PNG ou JPG: ${img}`);
+  });
+  const slugs = new Set();
+  const eventos = agenda.filter((c) => c?.isEnabled === true || c?.isEnabled === 'true').map((c, k) => {
+    const onde = `\`section_agenda.gigs\` (${c.id ?? `concerto ${k + 1}`})`;
+    const slug = slugificar(c.id ?? '');
+    if (!slug) throw new Error(`home.yaml: ${onde} tem de ter \`id\``);
+    if (slugs.has(slug)) throw new Error(`home.yaml: ${onde}: há outro concerto com o mesmo slug (${slug})`);
+    slugs.add(slug);
+    const data = String(c.data ?? '').match(/^(\d{4})(\d{2})(\d{2})$/);
+    const dia = data && new Date(Date.UTC(data[1], data[2] - 1, data[3]));
+    if (!data || dia.getUTCDate() !== Number(data[3])) throw new Error(`home.yaml: ${onde} tem de ter \`data\` no formato 'AAAAMMDD'`);
+    ['name', 'location'].forEach((campo) => {
+      if (!String(c[campo] ?? '').trim()) throw new Error(`home.yaml: ${onde} tem de ter \`${campo}\``);
+    });
+    const imagens = {};
+    Object.entries(imagensDefault).forEach(([campo, chave]) => {
+      const img = String(c[campo] ?? '').trim();
+      imagens[campo] = img || String(config.section_agenda?.default_images?.[chave] ?? '').trim();
+      if (!img) return;
+      if (!fs.existsSync(path.join(SRC, 'images', img))) throw new Error(`home.yaml: ${onde}: imagem não existe: images/${img}`);
+      if (!IMG_CONVERTIVEIS.test(img)) throw new Error(`home.yaml: ${onde}: \`${campo}\` tem de ser PNG ou JPG: ${img}`);
+    });
+    return { ...c, ...imagens, slug, pagina: `evento-${slug}.html`, dia, iso: `${data[1]}-${data[2]}-${data[3]}` };
+  }).sort((a, b) => (a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0));
+  // Medidas das imagens dos concertos, para o width/height dos <img>.
+  const medidas = {};
+  await Promise.all(eventos.flatMap((c) => [c.imagem_h, c.imagem_v_4x5])
+    .map((img) => String(img ?? '').trim()).filter(Boolean)
+    .map(async (img) => { medidas[img] = await sharp(path.join(SRC, 'images', img)).metadata(); }));
+  // Valor de um campo de um concerto na língua da página (vazio se não estiver preenchido).
+  const campo = (c, nome, lingua) => String(c[`${nome}_${lingua}`] || c[nome] || '').trim();
+
+  const concertos = eventos.filter((c) => c.iso >= hojeIso);
+  const agendaHtml = (lingua) => (_, indent) => concertos.map((c) => {
+    const { dias, meses } = DATAS[lingua];
+    const bilhetes = campo(c, 'ticketsLink', lingua);
+    return [
+      `<li data-date="${c.iso}">`,
+      `  <span class="date">${dias[c.dia.getUTCDay()]}, ${c.dia.getUTCDate()} ${meses[c.dia.getUTCMonth()]}</span>`,
+      `  <a class="venue" href="${c.pagina}">${escapar(campo(c, 'name', lingua))}</a>`,
+      `  <span class="city">${escapar(campo(c, 'location', lingua))}</span>`,
+      bilhetes
+        ? `  <a class="btn btn--ticket fx-tada" href="${escapar(bilhetes)}" target="_blank" rel="noopener">${ROTULOS[lingua].bilhetes}</a>`
+        : `  <a class="btn btn--ticket fx-tada" href="${c.pagina}">${ROTULOS[lingua].info}</a>`,
+      '</li>',
+    ].map((l) => indent + l).join('\n');
+  }).join('\n') + (concertos.length ? '\n' : '');
+
+  // Página de um concerto: data por extenso e resumo (data, hora, local e o início do `info`) para
+  // o <title>/meta description e a partilha (og:description).
+  const modeloEvento = fs.readFileSync(path.join(MODELOS, 'evento.html'), 'utf8');
+  const dataLonga = (c, lingua) => c.dia.toLocaleDateString(DATAS[lingua].locale,
+    { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const resumo = (c, lingua) => {
+    const quando = [dataLonga(c, lingua), campo(c, 'time', lingua)].filter(Boolean).join(', ');
+    const texto = [`${quando} — ${campo(c, 'location', lingua)}.`, campo(c, 'info', lingua)].filter(Boolean).join(' ');
+    return texto.length <= RESUMO_MAX ? texto : texto.slice(0, RESUMO_MAX - 1).replace(/\s+\S*$/, '') + '…';
+  };
+  // Conteúdo do <main> da página de um concerto (marcador `<!-- @evento -->`): hero, título, data,
+  // hora, local, info, bilhetes e contactos do local. Um campo vazio não é colocado. O hero tem a
+  // `imagem_h` e a `imagem_v_4x5` (o CSS mostra a vertical só em ecrãs na vertical) ou só a
+  // que existir.
+  const eventoHtml = (c, lingua) => (_, indent) => {
+    const r = ROTULOS[lingua];
+    const v = (nome) => campo(c, nome, lingua);
+    const externo = (href, conteudo) => `<a href="${escapar(href)}" target="_blank" rel="noopener">${conteudo}</a>`;
+    const img = (ficheiro, classe) => {
+      const { width, height } = medidas[ficheiro];
+      return `<img${classe ? ` class="${classe}"` : ''} src="images/${ficheiro}" alt="" width="${width}" height="${height}"${classe ? ' loading="lazy"' : ''}>`;
+    };
+    const [horizontal, vertical] = [c.imagem_h, c.imagem_v_4x5].map((f) => String(f ?? '').trim());
+    const hero = horizontal && vertical
+      ? ['<div class="evento-hero">', `  ${img(horizontal, 'hero-h')}`, `  ${img(vertical, 'hero-v')}`, '</div>']
+      : horizontal || vertical ? ['<div class="evento-hero">', `  ${img(horizontal || vertical)}`, '</div>'] : [];
+    const meta = [
+      ['fa-regular fa-calendar', dataLonga(c, lingua)],
+      ['fa-regular fa-clock', v('time')],
+      ['fa-solid fa-location-dot', v('location')],
+    ].filter(([, t]) => t).map(([icone, t]) => `<span><i class="${icone}"></i>${escapar(t)}</span>`).join('');
+    const [morada, mapa, web, telefone, email] = ['address', 'mapsUrl', 'websiteUrl', 'phone', 'email'].map(v);
+    const dados = [
+      (morada || mapa) && ['fa-solid fa-map-location-dot', mapa ? externo(mapa, morada ? escapar(morada) : r.mapa) : escapar(morada)],
+      web && ['fa-solid fa-globe', externo(web, escapar(web.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')))],
+      telefone && ['fa-solid fa-phone', `<a href="tel:${escapar(telefone.replace(/[^\d+]/g, ''))}">${escapar(telefone)}</a>`],
+      email && ['fa-solid fa-envelope', `<a href="mailto:${escapar(email)}">${escapar(email)}</a>`],
+    ].filter(Boolean).map(([icone, conteudo]) => `    <li><i class="${icone}"></i>${conteudo}</li>`);
+    return [
+      ...hero,
+      '<article class="post evento">',
+      `  <h1>${escapar(v('name'))}</h1>`,
+      `  <div class="meta">${meta}</div>`,
+      ...(v('info') ? [`  <p class="lead">${escapar(v('info'))}</p>`] : []),
+      ...(v('ticketsLink') ? [`  <a class="btn btn--pill fx-tada" href="${escapar(v('ticketsLink'))}" target="_blank" rel="noopener">${r.comprar}</a>`] : []),
+      ...(dados.length ? [`  <h2>${r.local}</h2>`, '  <ul class="evento-dados">', ...dados, '  </ul>'] : []),
+      `  <p class="evento-voltar"><a class="read-more" href="index.html#tour">← ${r.voltar}</a></p>`,
+      '</article>',
+    ].map((l) => indent + l).join('\n');
   };
 
   // Cada imagem fica `duracao` s visível; o ciclo é n × duracao. A imagem k começa a aparecer
@@ -277,44 +443,89 @@ async function main() {
   // URL público de uma página numa língua (index.html → raiz da pasta da língua).
   const url = (lingua, pagina) => SITE_URL + LINGUAS[lingua].pasta + (pagina === 'index.html' ? '' : pagina);
 
-  // Cada página, em cada língua: partials, blocos {{#lang}}, marcadores, <picture> e, nas
-  // línguas em subpasta, caminhos dos recursos a subir até à raiz de dist/.
-  Object.entries(LINGUAS).forEach(([lingua, { pasta }]) => {
+  // Imagem de partilha das páginas que não são de concertos (`default_share_image` do site.yaml).
+  const imagemPartilha = String(site.default_share_image ?? '').trim();
+  if (imagemPartilha && !fs.existsSync(path.join(SRC, 'images', imagemPartilha))) throw new Error(`site.yaml: \`default_share_image\`: imagem não existe: images/${imagemPartilha}`);
+  if (imagemPartilha && !IMG_CONVERTIVEIS.test(imagemPartilha)) throw new Error(`site.yaml: \`default_share_image\` tem de ser PNG ou JPG: ${imagemPartilha}`);
+
+  // `<!-- @og -->` (no <head>): og:url e og:locale e, nas páginas dos concertos com
+  // `imagem_v_4x5`, a imagem de partilha (og:title e og:description vêm do header).
+  // As restantes páginas usam a `default_share_image` do site.yaml (images/og/_default.jpg; o `_`
+  // não aparece nos slugs, por isso não colide com nenhum concerto).
+  const ogTags = (lingua, pagina, evento) => {
+    const imagem = evento ? String(evento.imagem_v_4x5 ?? '').trim() && evento.slug : imagemPartilha && '_default';
+    return [
+      `<meta property="og:url" content="${url(lingua, pagina)}">`,
+      `<meta property="og:locale" content="${LINGUAS[lingua].og}">`,
+      ...(imagem ? [
+        `<meta property="og:image" content="${SITE_URL}images/og/${imagem}.jpg">`,
+        '<meta property="og:image:type" content="image/jpeg">',
+        `<meta property="og:image:width" content="${OG.largura}">`,
+        `<meta property="og:image:height" content="${OG.altura}">`,
+        `<meta property="og:image:alt" content="${escapar(evento ? campo(evento, 'name', lingua) : "Gringo's Washboard Band")}">`,
+        '<meta name="twitter:card" content="summary_large_image">',
+      ] : []),
+    ];
+  };
+
+  // Uma página numa língua: partials, blocos {{#lang}}, marcadores, <picture> e, nas línguas em
+  // subpasta, caminhos dos recursos a subir até à raiz de dist/. `evento` só nas páginas dos concertos.
+  const gerarPagina = (fonte, pagina, lingua, evento) => {
+    const { pasta } = LINGUAS[lingua];
     const nivel = pasta.split('/').filter(Boolean).length;
+    let html = incluirPartials(fonte, pagina);
+    html = escolherLingua(html, lingua, pagina);
+    if (pagina === 'index.html') {
+      html = substituirMarcador(html, /^[ \t]*<!-- @hero-imagens.*-->/m, heroImagens, pagina);
+      html = substituirMarcador(html, /^[ \t]*<!-- @hero-cta.*-->\r?\n?/m, heroCta(lingua), pagina);
+      html = substituirMarcador(html, /^([ \t]*)<!-- @agenda -->\r?\n?/m, agendaHtml(lingua), pagina);
+    }
+    if (evento) html = substituirMarcador(html, /^([ \t]*)<!-- @evento -->/m, eventoHtml(evento, lingua), pagina);
+    // `<!-- @idioma -->`: link para a mesma página nas outras línguas; `<!-- @hreflang -->`:
+    // um <link rel="alternate"> por língua (mais x-default, a principal).
+    const idioma = Object.entries(LINGUAS).filter(([l]) => l !== lingua).map(([, outra]) =>
+      `<a href="${'../'.repeat(nivel)}${outra.pasta}${pagina}" lang="${outra.codigo}" hreflang="${outra.codigo}">${outra.nome} <img class="flag" src="images/${outra.bandeira}" alt="" width="24" height="12"></a>`).join(' ');
+    const hreflang = (indent) => [
+      ...Object.entries(LINGUAS).map(([l, { codigo }]) => `<link rel="alternate" hreflang="${codigo}" href="${url(l, pagina)}">`),
+      `<link rel="alternate" hreflang="x-default" href="${url(Object.keys(LINGUAS)[0], pagina)}">`,
+    ].map((l) => indent + l).join('\n');
+    html = html
+      .replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, listaIcones(social, 'social'))
+      .replace(/^([ \t]*)<!-- @hreflang -->/gm, (_, indent) => hreflang(indent))
+      .replace(/^([ \t]*)<!-- @og -->/gm, (_, indent) => ogTags(lingua, pagina, evento).map((l) => indent + l).join('\n'))
+      .replace(/<!-- @idioma -->/g, idioma)
+      .replace(/<!-- @email -->/g, linkEmail)
+      .replace(/<!-- @telefone -->/g, linkTelefone);
+    html = usarPicture(versionar(html));
+    if (nivel) html = subirCaminhos(html, nivel);
+    fs.writeFileSync(path.join(DIST, pasta, pagina), html);
+  };
+
+  // As páginas de src/ e a de cada concerto (o modelo com o <title> e a descrição do concerto),
+  // em cada língua.
+  Object.entries(LINGUAS).forEach(([lingua, { pasta }]) => {
     fs.mkdirSync(path.join(DIST, pasta), { recursive: true });
-    paginas.forEach((pagina) => {
-      let html = incluirPartials(fs.readFileSync(path.join(SRC, pagina), 'utf8'), pagina);
-      html = escolherLingua(html, lingua, pagina);
-      if (pagina === 'index.html') {
-        html = substituirMarcador(html, /^[ \t]*<!-- @hero-imagens.*-->/m, heroImagens, pagina);
-        html = substituirMarcador(html, /^[ \t]*<!-- @hero-cta.*-->\r?\n?/m, heroCta(lingua), pagina);
-      }
-      // `<!-- @idioma -->`: link para a mesma página nas outras línguas; `<!-- @hreflang -->`:
-      // um <link rel="alternate"> por língua (mais x-default, a principal).
-      const idioma = Object.entries(LINGUAS).filter(([l]) => l !== lingua).map(([, outra]) =>
-        `<a href="${'../'.repeat(nivel)}${outra.pasta}${pagina}" lang="${outra.codigo}" hreflang="${outra.codigo}">${outra.nome} <img class="flag" src="images/${outra.bandeira}" alt="" width="24" height="12"></a>`).join(' ');
-      const hreflang = (indent) => [
-        ...Object.entries(LINGUAS).map(([l, { codigo }]) => `<link rel="alternate" hreflang="${codigo}" href="${url(l, pagina)}">`),
-        `<link rel="alternate" hreflang="x-default" href="${url(Object.keys(LINGUAS)[0], pagina)}">`,
-      ].map((l) => indent + l).join('\n');
-      html = html
-        .replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, listaIcones(social, 'social'))
-        .replace(/^([ \t]*)<!-- @hreflang -->/gm, (_, indent) => hreflang(indent))
-        .replace(/<!-- @idioma -->/g, idioma)
-        .replace(/<!-- @email -->/g, linkEmail)
-        .replace(/<!-- @telefone -->/g, linkTelefone);
-      html = usarPicture(versionar(html));
-      if (nivel) html = subirCaminhos(html, nivel);
-      fs.writeFileSync(path.join(DIST, pasta, pagina), html);
-    });
+    paginas.forEach((pagina) => gerarPagina(fs.readFileSync(path.join(SRC, pagina), 'utf8'), pagina, lingua));
+    eventos.forEach((c) => gerarPagina(modeloEvento
+      .replace(/\[\[titulo\]\]/g, () => escapar(campo(c, 'name', lingua)))
+      .replace(/\[\[descricao\]\]/g, () => escapar(resumo(c, lingua))), c.pagina, lingua, c));
   });
 
-  // Imagens: AVIF + WebP (os <picture> já foram postos nas páginas).
+  // Imagens: AVIF + WebP (os <picture> já foram postos nas páginas) e as de partilha dos concertos.
   const imagens = await converterImagens();
+  const ogNovas = (await Promise.all([
+    ...eventos.filter((c) => String(c.imagem_v_4x5 ?? '').trim()).map((c) => imagemOg(String(c.imagem_v_4x5).trim(), c.slug)),
+    ...(imagemPartilha ? [imagemOg(imagemPartilha, '_default')] : []),
+  ])).filter(Boolean).length;
 
-  // Sitemap: uma entrada por cada página em cada língua (index.html → raiz da língua).
-  const urls = Object.keys(LINGUAS).flatMap((lingua) => paginas.map((pagina) => {
-    const lastmod = fs.statSync(path.join(SRC, pagina)).mtime.toISOString().slice(0, 10);
+  // Sitemap: uma entrada por cada página em cada língua (index.html → raiz da língua); as dos
+  // concertos têm a data do home.yaml.
+  const fontes = [
+    ...paginas.map((pagina) => [pagina, path.join(SRC, pagina)]),
+    ...eventos.map((c) => [c.pagina, path.join(CONTEUDO, 'home.yaml')]),
+  ];
+  const urls = Object.keys(LINGUAS).flatMap((lingua) => fontes.map(([pagina, fonte]) => {
+    const lastmod = fs.statSync(fonte).mtime.toISOString().slice(0, 10);
     return `  <url>\n    <loc>${url(lingua, pagina)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;
   }));
 
@@ -326,7 +537,7 @@ async function main() {
   fs.writeFileSync(path.join(DIST, 'robots.txt'),
     `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
-  console.log(`Build concluído: src/ → dist/ (${paginas.length} páginas em ${Object.keys(LINGUAS).join(', ')}; ${imagens.total} imagens em AVIF/WebP, ${imagens.convertidas} conversões novas; sitemap com ${urls.length} URLs, robots.txt)`);
+  console.log(`Build concluído: src/ → dist/ (${paginas.length} páginas e ${eventos.length} de concertos em ${Object.keys(LINGUAS).join(', ')}; ${imagens.total} imagens em AVIF/WebP, ${imagens.convertidas} conversões novas, ${ogNovas} de partilha novas; sitemap com ${urls.length} URLs, robots.txt)`);
 }
 
 main().catch((err) => {

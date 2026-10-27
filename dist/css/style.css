@@ -211,11 +211,6 @@ button { font: inherit; cursor: pointer; }
 
 /* ---------- Agenda (gold) ---------- */
 .tour-poster { width: min(560px, 100%); margin: 0 auto 30px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-.tour-follow { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-.tour-follow a { text-decoration: underline; }
-.tour-tabs { display: flex; gap: 12px; font-size: 14px; font-weight: 700; margin-bottom: 18px; }
-.tour-tabs button { background: none; border: 0; padding: 0; color: var(--black); font-weight: 700; }
-.tour-tabs button.is-active { color: var(--ticket-red); text-decoration: underline; }
 .tour-list li {
   display: grid; grid-template-columns: 150px 1fr 200px auto; align-items: center; gap: 12px;
   padding: 7px 12px; margin-inline: -12px; font-size: 15px; cursor: pointer;
@@ -227,8 +222,6 @@ button { font: inherit; cursor: pointer; }
 .tour-list .venue { color: var(--ticket-red); }
 .tour-list .venue:hover { text-decoration: underline; }
 .tour-list .city { text-align: right; }
-.tour-list li.is-hidden { display: none; }
-.tour-list li.is-past .btn--ticket { background: #6f6f6f; pointer-events: none; }
 
 /* ---------- Live session (grey) ---------- */
 .feature { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; }
@@ -372,6 +365,28 @@ button { font: inherit; cursor: pointer; }
 .post .contacts a { color: var(--black); }
 .post .contacts a:hover { color: var(--rust); }
 
+/* ---------- Página de concerto ---------- */
+/* Hero com a imagem horizontal (.hero-h) e a vertical (.hero-v, 4:5) só em ecrãs na vertical
+   (regras de .hero-h/.hero-v na secção Hero). A imagem aparece inteira, sem cortes: largura total,
+   altura proporcional e, se passar de 42vh, encolhe (com o fundo escuro dos lados). Com hero, o
+   cartão do artigo sobe um pouco sobre a imagem. */
+.evento-hero { margin-top: var(--header-h); background: #1b1310; }
+.evento-hero img { width: 100%; height: auto; max-height: 42vh; object-fit: contain; margin-inline: auto; }
+.post.evento { margin-top: calc(var(--header-h) + 30px); }
+.evento-hero + .post.evento { position: relative; margin-top: -60px; }
+/* Data, hora e local em destaque (maiores e a negro que a .meta normal) */
+.post.evento .meta {
+  font-family: var(--f-head); font-size: 22px; font-weight: 500; line-height: 1.3;
+  color: var(--black); gap: 8px 28px; margin: 14px 0 0;
+}
+.post.evento .meta i { margin-right: 8px; color: var(--rust); }
+.post.evento .btn--pill { margin-bottom: 10px; }
+.evento-dados li { display: flex; gap: 12px; padding: 5px 0; }
+.evento-dados i { width: 18px; margin-top: 4px; text-align: center; color: var(--rust); flex: none; }
+.evento-dados a { color: var(--black); overflow-wrap: anywhere; }
+.evento-dados a:hover { color: var(--rust); }
+.evento-voltar { margin: 36px 0 0; }
+
 /* ---------- Embed placeholder ---------- */
 .embed { position: relative; aspect-ratio: 16 / 9; background: #111; overflow: hidden; }
 .embed img { width: 100%; height: 100%; object-fit: cover; opacity: .75; }
@@ -445,6 +460,7 @@ button { font: inherit; cursor: pointer; }
   .tour-list .city { grid-column: 1; grid-row: auto; margin-top: 0; }
   .tour-list .btn--ticket { grid-column: 2; grid-row: 1 / span 3; }
   .post .lead { font-size: 18px; }
+  .post.evento .meta { font-size: 19px; flex-direction: column; }
   .hero-cta { flex-direction: column; align-items: center; gap: 10px; }
 }
 
