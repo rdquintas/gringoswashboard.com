@@ -6,7 +6,7 @@ Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens d
 
 ## Estado atual
 
-Site de uma página (`index.html`) com secções (hero, álbum + reviews, agenda, live session, música, a banda, footer com newsletter) e duas páginas de imprensa (`press.html`, `press-post.html`). HTML escrito à mão, **sem templates nem framework**; o build copia `src/` → `dist/` e preenche alguns marcadores a partir de `src/conteudo/home.yaml`. Única dependência: `sharp` (devDependency, conversão de imagens); sem testes nem linter: validar correndo `npm run build`.
+Site de uma página (`index.html`) com secções (hero, álbum + reviews, agenda, live session, música, a banda, footer com newsletter) e duas páginas de imprensa (`press.html`, `press-post.html`). HTML escrito à mão, **sem templates nem framework**; o build copia `src/` → `dist/`, inclui os partials comuns (header/menu e footer) e preenche alguns marcadores a partir de `src/conteudo/home.yaml`. Única dependência: `sharp` (devDependency, conversão de imagens); sem testes nem linter: validar correndo `npm run build`.
 
 Muitas imagens ainda são placeholders de `placehold.co`.
 
@@ -23,10 +23,12 @@ Node 22 (`.nvmrc`, `netlify.toml`).
 
 ## Estrutura
 
-- **`build.js`** — limpa `dist/`, copia `src/` para lá (exceto `conteudo/`), aplica as configurações de `src/conteudo/home.yaml` (parser YAML mínimo próprio: mapas e listas, incluindo listas de mapas `- chave: valor`, aninhados por indentação com espaços), converte as imagens e gera `sitemap.xml` (um URL por cada `.html` na raiz de `src/`, `lastmod` = data do ficheiro) e `robots.txt`. URL base na constante `SITE_URL`.
+- **`build.js`** — limpa `dist/`, copia `src/` para lá (exceto `conteudo/` e `partials/`), inclui os partials, aplica as configurações de `src/conteudo/home.yaml` (parser YAML mínimo próprio: mapas e listas, incluindo listas de mapas `- chave: valor`, aninhados por indentação com espaços), converte as imagens e gera `sitemap.xml` (um URL por cada `.html` na raiz de `src/`, `lastmod` = data do ficheiro) e `robots.txt`. URL base na constante `SITE_URL`.
 - **`src/`** — ficheiros do site:
   - `conteudo/home.yaml` — configurações do site, agrupadas por secção: `section_hero` com `hero` (lista de imagens do slideshow, em `images/`) e `duracao_hero` (segundos que cada imagem fica visível); `section_about` com `members` (lista com `nome`, `instrumento.pt`/`instrumento.en` e `foto`; ainda não usada pelo build).
-  - `index.html`, `press.html`, `press-post.html` — o header, menu e footer estão repetidos em cada página (alterar em todas).
+  - `conteudo/site.yaml` — dados comuns a todas as páginas: `contactos` (o build substitui cada `<!-- @email -->` pelo link `mailto:` de `contactos.email` e cada `<!-- @telefone -->` pelo link `tel:` de `contactos.telefone`) e `links` (redes sociais: `facebook`, `instagram`, `youtube`, `spotify`, `soundcloud`, `bandcamp`; as aceites estão na constante `REDES` do `build.js`). O build substitui cada `<!-- @social -->` dos partials pela `<ul class="social">`, pela ordem do YAML, com `target="_blank" rel="noopener"`; uma rede com link vazio não é colocada (sem nenhuma, a `<ul>` também não).
+  - `partials/` — HTML comum a todas as páginas: `header.html` (do `<!DOCTYPE>` ao `<body>`, com o `<head>` completo, + header + menu fullscreen) e `footer.html` (conteúdo do `<footer>`). O build substitui cada `<!-- @partial nome chave="valor" … -->` pelo `partials/nome.html`, com a indentação do marcador; cada `{{chave}}` do partial leva o valor do atributo (obrigatório; `{{chave?}}` é opcional e um `class=""` vazio é retirado). No header, acrescenta `aria-current="page"` ao link do menu cujo `href` é a própria página.
+  - `index.html`, `press.html`, `press-post.html` — páginas que começam por `<!-- @partial header titulo="…" descricao="…" classe="…" -->` (`<title>`, meta description e classe opcional do `<body>`) e têm, dentro do `<footer>`, `<!-- @partial footer -->` (a tag `<footer>` fica na página porque varia: no index tem `section--black` e a curva SVG).
   - `css/style.css` — todos os estilos, organizados por secções (`/* ---------- Hero ---------- */`); cores e fontes como variáveis em `:root`.
   - `js/main.js` — JS vanilla sem dependências (IIFE): menu fullscreen, reveal ao fazer scroll, efeitos "tada"/pulse, slider de reviews, tabs da agenda, newsletter (mock), ano no footer. Acrescenta a classe `js` ao `<html>`.
   - `images/` — `hero01–03.png` (slideshow do hero), `band.jpg`, `musico01–05.png`.
@@ -35,7 +37,7 @@ Node 22 (`.nvmrc`, `netlify.toml`).
 
 ## Convenções
 
-- **Hero:** as imagens e o tempo vêm do `home.yaml`. O build substitui `<!-- @hero-imagens -->` em `index.html` pelas `<img>` e `/* @hero-animacao */` em `style.css` pela animação (`@keyframes hero-fade`, ciclo = nº de imagens × `duracao_hero`, `animation-delay` negativos, fade de 1,5s na constante `HERO_FADE`). Crossfade só com CSS.
+- **Hero:** as imagens e o tempo vêm do `home.yaml`. O build substitui `<!-- @hero-imagens -->` em `index.html` pelas `<img>` e `/* @hero-animacao */` em `style.css` pela animação (`@keyframes hero-fade`, ciclo = nº de imagens × `duracao_hero`, `animation-delay` negativos, fade de 1,5s na constante `HERO_FADE`). Crossfade só com CSS. Os botões vêm de `cta1` (dourado) e `cta2` (preto), com texto em `pt` e `link`: o build substitui `<!-- @hero-cta -->` pelo `<div class="hero-cta">`; um CTA com `link` vazio não é colocado (sem nenhum, o `<div>` também não).
 - **Movimento reduzido:** respeitar `prefers-reduced-motion` — no CSS há um bloco global que desliga animações/transições, e o JS verifica `reduceMotion` antes de animar.
 - **Acessibilidade:** `aria-label` nos links só com ícone, `alt=""` em imagens decorativas, `aria-expanded`/`aria-hidden` atualizados pelo JS no menu.
 

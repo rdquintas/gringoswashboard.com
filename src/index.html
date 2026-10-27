@@ -1,68 +1,11 @@
-<!DOCTYPE html>
-<html lang="pt-PT">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gringo's Washboard Band</title>
-  <meta name="description" content="Gringo's Washboard Band — tábua de lavar, jug band blues, ragtime e swing. O novo álbum Rub-a-Dub Blues já está disponível.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Catamaran:wght@400;700&family=Oswald:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
-  <!-- ===== Header ===== -->
-  <header class="site-header">
-    <a class="logo" href="index.html" aria-label="Gringo's Washboard Band — início">
-      <img src="images/logo.jpg" alt="" width="100" height="100">
-    </a>
-    <div class="header-right">
-      <ul class="social">
-        <li><a class="fx-tada" href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="Spotify"><i class="fa-brands fa-spotify"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="E-mail"><i class="fa-solid fa-envelope"></i></a></li>
-      </ul>
-      <button class="burger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ===== Fullscreen menu ===== -->
-  <div class="menu" id="menu" aria-hidden="true">
-    <button class="menu-close" type="button" aria-label="Fechar menu">&times;</button>
-    <nav aria-label="Principal">
-      <ul>
-        <li><a href="index.html" aria-current="page">Início</a></li>
-        <li><a href="index.html#band">Sobre</a></li>
-        <li><a href="index.html#videos">Média</a></li>
-        <li><a href="index.html#tour">Agenda</a></li>
-        <li><a href="#" lang="en">English <img class="flag" src="images/flag-uk.svg" alt="" width="24" height="12"></a></li>
-        <li><a href="#contact">Contacto</a></li>
-      </ul>
-      <ul class="social">
-        <li><a class="fx-tada" href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="Spotify"><i class="fa-brands fa-spotify"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="E-mail"><i class="fa-solid fa-envelope"></i></a></li>
-      </ul>
-    </nav>
-  </div>
+<!-- @partial header titulo="Gringo's Washboard Band" descricao="Gringo's Washboard Band — tábua de lavar, jug band blues, ragtime e swing. O novo álbum Rub-a-Dub Blues já está disponível." -->
 
   <main>
     <!-- ===== Hero ===== -->
     <section class="hero" aria-label="Gringo's Washboard Band ao vivo">
       <!-- @hero-imagens (gerado pelo build a partir de conteudo/home.yaml) -->
       <h1 class="hero-title">Gringo's Washboard Band</h1>
-      <div class="hero-cta">
-        <a class="btn btn--gold" href="#">Contratar a Banda</a>
-        <a class="btn btn--black" href="#">Datas da Digressão</a>
-      </div>
+      <!-- @hero-cta (gerado pelo build a partir de conteudo/home.yaml) -->
     </section>
 
     <!-- ===== The band (rust) ===== -->
@@ -178,7 +121,7 @@
       <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,90 Q720,-30 1440,90 Z"/></svg>
       <div class="wrap">
         <h2 class="section-title reveal">Agenda</h2>
-        <img class="tour-poster fx-inout reveal" src="https://placehold.co/1100x620/1b1310/e5bf5e?text=Rub-a-Dub+Tour+2026&font=oswald" alt="Cartaz da Rub-a-Dub Tour 2026" width="1100" height="620">
+        <img class="tour-poster fx-inout reveal" src="/images/agenda.jpg" alt="Cartaz da Rub-a-Dub Tour 2026" width="1100" height="620">
         <p class="tour-follow"><a href="#">Segue</a> a banda para receberes novidades sobre concertos e transmissões em direto.</p>
         <div class="tour-tabs" role="tablist">
           <button type="button" class="is-active" data-mode="upcoming" role="tab">Próximas Datas</button>
@@ -189,91 +132,91 @@
             <span class="date">Sex, 6 nov</span>
             <a class="venue" href="#">Festa de Lançamento de Rub-a-Dub Blues</a>
             <span class="city">Lisboa, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Sáb, 7 nov</span>
             <a class="venue" href="#">Hot Club de Portugal</a>
             <span class="city">Lisboa, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Qui, 12 nov</span>
             <a class="venue" href="#">Casa da Música — Sala 2</a>
             <span class="city">Porto, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Sex, 13 nov</span>
             <a class="venue" href="#">Salão Brazil</a>
             <span class="city">Coimbra, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Sáb, 14 nov</span>
             <a class="venue" href="#">Theatro Circo</a>
             <span class="city">Braga, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Qui, 19 nov</span>
             <a class="venue" href="#">Café Berlin</a>
             <span class="city">Madrid, ES</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Sex, 20 nov</span>
             <a class="venue" href="#">Jamboree Jazz Club</a>
             <span class="city">Barcelona, ES</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Sáb, 21 nov</span>
             <a class="venue" href="#">Le Caveau de la Huchette</a>
             <span class="city">Paris, FR</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Ter, 24 nov</span>
             <a class="venue" href="#">Paradiso — Sala Pequena</a>
             <span class="city">Amesterdão, NL</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Qui, 26 nov</span>
             <a class="venue" href="#">The Jazz Café</a>
             <span class="city">Londres, UK</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">Sáb, 5 dez</span>
             <a class="venue" href="#">Washboard Winter Festival</a>
             <span class="city">Gante, BE</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="upcoming">
             <span class="date">30 dez – 2 jan 2027</span>
             <a class="venue" href="#">Cruzeiro Swing de Ano Novo</a>
             <span class="city">Lisboa → Funchal</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="past">
             <span class="date">Sáb, 12 set</span>
             <a class="venue" href="#">Festa do Avante — Palco Arraial</a>
             <span class="city">Seixal, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="past">
             <span class="date">Sáb, 8 ago</span>
             <a class="venue" href="#">Festival Sons de Vez</a>
             <span class="city">Arcos de Valdevez, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
           <li data-when="past">
             <span class="date">Sex, 17 jul</span>
             <a class="venue" href="#">Blues in the Park</a>
             <span class="city">Évora, PT</span>
-            <a class="btn btn--ticket fx-tada" href="#">Bilhetes</a>
+            <a class="btn btn--ticket fx-tada" href="#">Informações</a>
           </li>
         </ul>
         <button class="btn btn--outline tour-more" type="button">Ver todas as datas</button>
@@ -336,56 +279,7 @@
   <!-- ===== Footer ===== -->
   <footer class="site-footer section--black" id="contact">
     <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,90 Q720,-30 1440,90 Z"/></svg>
-    <div class="wrap">
-      <div class="footer-top">
-        <div>
-          <h4>Newsletter dos Gringo's</h4>
-          <p>Inscreve-te para receberes novidades sobre música nova, concertos e um ou outro percalço com a tábua de lavar.</p>
-          <form class="newsletter" novalidate>
-            <div class="row">
-              <label class="visually-hidden" for="nl-name">Nome próprio</label>
-              <input id="nl-name" type="text" name="name" placeholder="Nome" autocomplete="given-name">
-              <label class="visually-hidden" for="nl-email">E-mail</label>
-              <input id="nl-email" type="email" name="email" placeholder="O teu e-mail" autocomplete="email" required>
-            </div>
-            <button class="btn btn--gold" type="submit">Subscrever novidades</button>
-            <p class="newsletter-msg" role="status"></p>
-          </form>
-        </div>
-        <div class="contact-card">
-          <div>
-            <i class="fa-regular fa-envelope"></i>
-            <p><strong>Imprensa e Informações Gerais</strong>
-              <span>Marta Lavadeira</span>
-              <a href="mailto:press@gringoswashboardband.com">press@gringoswashboardband.com</a></p>
-          </div>
-          <div>
-            <i class="fa-regular fa-calendar"></i>
-            <p><strong>Contratações</strong>
-              <span>Agência Rub &amp; Scrub</span>
-              <a href="mailto:booking@gringoswashboardband.com">booking@gringoswashboardband.com</a></p>
-          </div>
-        </div>
-      </div>
-      <div class="footer-nav">
-        <ul>
-          <li><a href="index.html">Início</a></li>
-          <li><a href="index.html#band">Sobre</a></li>
-          <li><a href="index.html#videos">Média</a></li>
-          <li><a href="index.html#tour">Agenda</a></li>
-          <li><a href="#" lang="en">English <img class="flag" src="images/flag-uk.svg" alt="" width="24" height="12"></a></li>
-        </ul>
-        <ul class="social">
-        <li><a class="fx-tada" href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="Spotify"><i class="fa-brands fa-spotify"></i></a></li>
-        <li><a class="fx-tada" href="#" aria-label="E-mail"><i class="fa-solid fa-envelope"></i></a></li>
-      </ul>
-      </div>
-      <div class="footer-legal"><a href="#">Política de Privacidade</a><a href="#">Política de Cookies</a></div>
-      <p class="copyright">&copy; <span data-year>2026</span> Gringo's Washboard Band. Todos os direitos reservados.</p>
-    </div>
+    <!-- @partial footer -->
   </footer>
 
   <script src="js/main.js"></script>

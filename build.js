@@ -1,5 +1,5 @@
-// Build: copia src/ para dist/ (limpa dist/ antes), aplica as configurações de
-// src/conteudo/home.yaml (hero), converte as imagens para AVIF e WebP (com <picture> e
+// Build: copia src/ para dist/ (limpa dist/ antes), inclui os partials (header, footer),
+// aplica as configurações de src/conteudo/home.yaml (hero) e site.yaml (redes sociais), converte as imagens para AVIF e WebP (com <picture> e
 // fallback para o original) e gera sitemap.xml e robots.txt.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -8,10 +8,20 @@ const sharp = require('sharp');
 const SRC = path.join(__dirname, 'src');
 const DIST = path.join(__dirname, 'dist');
 const CONTEUDO = path.join(SRC, 'conteudo');
+const PARTIALS = path.join(SRC, 'partials');
 const CACHE = path.join(__dirname, '.cache', 'images');
 const SITE_URL = 'https://gringoswashboard.com/';
 const HERO_FADE = 1.5; // segundos de crossfade entre imagens do hero
 const IMG_CONVERTIVEIS = /\.(png|jpe?g)$/i;
+// Redes sociais aceites em `links` do site.yaml: nome (aria-label) e ícone do Font Awesome.
+const REDES = {
+  facebook: ['Facebook', 'fa-facebook'],
+  instagram: ['Instagram', 'fa-instagram'],
+  youtube: ['YouTube', 'fa-youtube'],
+  spotify: ['Spotify', 'fa-spotify'],
+  soundcloud: ['SoundCloud', 'fa-soundcloud'],
+  bandcamp: ['Bandcamp', 'fa-bandcamp'],
+};
 // Formatos gerados, pela ordem de preferência nos <source> do <picture>.
 const FORMATOS = [
   { ext: 'avif', type: 'image/avif', opcoes: { quality: 50, effort: 4 } },
@@ -28,8 +38,11 @@ function lerYaml(ficheiro) {
   // Contentores abertos, do mais exterior para o mais interior; `valor` fica null até se
   // saber se a chave é um mapa ou uma lista.
   const pilha = [{ indent: -1, valor: dados }];
+  // Valores entre aspas ficam sempre texto (ex.: '+351…'); só os outros podem ser números.
   const escalar = (v) => {
-    v = v.trim().replace(/^(['"])(.*)\1$/, '$2');
+    v = v.trim();
+    const aspas = v.match(/^(['"])(.*)\1$/);
+    if (aspas) return aspas[2];
     return v !== '' && !isNaN(v) ? Number(v) : v;
   };
   const definir = (mapa, [, chave, valor = ''], indent) => {
@@ -72,6 +85,29 @@ function substituirMarcador(ficheiro, marcador, conteudo) {
   fs.writeFileSync(ficheiro, texto.replace(marcador, () => conteudo));
 }
 
+// Substitui cada `<!-- @partial nome chave="valor" … -->` pelo conteúdo de src/partials/nome.html,
+// indentado como o marcador. Cada `{{chave}}` do partial leva o valor do atributo com o mesmo
+// nome (obrigatório); `{{chave?}}` é opcional e fica vazio, e um `class=""` que daí resulte sai.
+// No header, o link do menu para a própria página leva aria-current="page".
+function incluirPartials(ficheiro) {
+  const pagina = path.basename(ficheiro);
+  const html = fs.readFileSync(ficheiro, 'utf8').replace(/^([ \t]*)<!-- @partial ([\w-]+)((?:\s+[\w-]+="[^"]*")*)\s*-->/gm, (_, indent, nome, atributos) => {
+    const origem = path.join(PARTIALS, `${nome}.html`);
+    if (!fs.existsSync(origem)) throw new Error(`${pagina}: partial não existe: partials/${nome}.html`);
+    const valores = Object.fromEntries([...atributos.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => m.slice(1)));
+    let partial = fs.readFileSync(origem, 'utf8').replace(/\r?\n$/, '')
+      .replace(/\{\{([\w-]+)(\??)\}\}/g, (_, chave, opcional) => {
+        if (chave in valores) return valores[chave];
+        if (opcional) return '';
+        throw new Error(`${pagina}: falta o atributo ${chave}="…" no <!-- @partial ${nome} -->`);
+      })
+      .replace(/ class=""/g, '');
+    if (nome === 'header') partial = partial.replace(`<a href="${pagina}">`, `<a href="${pagina}" aria-current="page">`);
+    return partial.split(/\r?\n/).map((l) => (l ? indent + l : l)).join('\n');
+  });
+  fs.writeFileSync(ficheiro, html);
+}
+
 // Converte cada PNG/JPG de src/images/ para AVIF e WebP em dist/images/, ao lado do original
 // (que fica como fallback). As conversões ficam em .cache/images/ e só se refazem quando o
 // original muda.
@@ -108,11 +144,15 @@ function usarPicture(ficheiro) {
 
 async function main() {
   const config = lerYaml(path.join(CONTEUDO, 'home.yaml'));
+  const site = lerYaml(path.join(CONTEUDO, 'site.yaml'));
 
   fs.rmSync(DIST, { recursive: true, force: true });
-  fs.cpSync(SRC, DIST, { recursive: true, filter: (f) => f !== CONTEUDO });
+  fs.cpSync(SRC, DIST, { recursive: true, filter: (f) => f !== CONTEUDO && f !== PARTIALS });
+  const paginas = fs.readdirSync(DIST).filter((f) => f.endsWith('.html'));
+  paginas.forEach((f) => incluirPartials(path.join(DIST, f)));
 
-  // Hero (`section_hero`): <img> a partir de `hero` e animação de crossfade a partir de `duracao_hero`.
+  // Hero (`section_hero`): <img> a partir de `hero`, botões a partir de `cta1`/`cta2` e
+  // animação de crossfade a partir de `duracao_hero`.
   const { hero, duracao_hero: duracao } = config.section_hero ?? {};
   if (!Array.isArray(hero) || hero.length === 0) throw new Error('home.yaml: `section_hero.hero` tem de ser uma lista de imagens');
   if (typeof duracao !== 'number' || duracao <= HERO_FADE) throw new Error(`home.yaml: \`section_hero.duracao_hero\` tem de ser um número maior que ${HERO_FADE}`);
@@ -123,6 +163,19 @@ async function main() {
 
   substituirMarcador(path.join(DIST, 'index.html'), /^[ \t]*<!-- @hero-imagens.*-->/m,
     hero.map((img) => `      <img src="images/${img}" alt="" width="1920" height="900">`).join('\n'));
+
+  // Botões do hero a partir de `cta1` (dourado) e `cta2` (preto), com o texto em `pt`.
+  // Um CTA sem `link` não é colocado; sem nenhum, não fica o contentor .hero-cta.
+  const escapar = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const ctas = [['cta1', 'btn--gold'], ['cta2', 'btn--black']]
+    .filter(([chave]) => String(config.section_hero[chave]?.link ?? '').trim() !== '')
+    .map(([chave, classe]) => {
+      const { pt, link } = config.section_hero[chave];
+      if (!pt) throw new Error(`home.yaml: \`section_hero.${chave}.pt\` tem de ter o texto do botão`);
+      return `        <a class="btn ${classe}" href="${escapar(link)}">${escapar(pt)}</a>`;
+    });
+  substituirMarcador(path.join(DIST, 'index.html'), /^[ \t]*<!-- @hero-cta.*-->\n?/m,
+    ctas.length ? `      <div class="hero-cta">\n${ctas.join('\n')}\n      </div>\n` : '');
 
   // Cada imagem fica `duracao` s visível; o ciclo é n × duracao. A imagem k começa a aparecer
   // em k × duracao − fade, para a primeira já estar visível ao carregar a página.
@@ -145,9 +198,36 @@ async function main() {
     ].join('\n');
   substituirMarcador(path.join(DIST, 'css', 'style.css'), /\/\* @hero-animacao \*\//, cssHero);
 
+  // Redes sociais (`links` do site.yaml): cada `<!-- @social -->` dos partials dá lugar à
+  // lista de ícones, pela ordem do YAML, abertos noutra janela. Uma rede com link vazio não
+  // é colocada; sem nenhuma, a lista também não.
+  const social = Object.entries(site.links ?? {})
+    .filter(([, link]) => String(link ?? '').trim() !== '')
+    .map(([rede, link]) => {
+      if (!REDES[rede]) throw new Error(`site.yaml: rede social desconhecida em \`links\`: ${rede} (conhecidas: ${Object.keys(REDES).join(', ')})`);
+      const [nome, icone] = REDES[rede];
+      return `<li><a class="fx-tada" href="${escapar(link)}" target="_blank" rel="noopener" aria-label="${nome}"><i class="fa-brands ${icone}"></i></a></li>`;
+    });
+  // Contactos do site.yaml: cada `<!-- @email -->` dá lugar ao link mailto de `contactos.email`
+  // e cada `<!-- @telefone -->` ao link tel de `contactos.telefone` (sem espaços no href).
+  const email = String(site.contactos?.email ?? '').trim();
+  if (!email) throw new Error('site.yaml: `contactos.email` tem de ter o email de contacto');
+  const linkEmail = `<a href="mailto:${escapar(email)}">${escapar(email)}</a>`;
+  const telefone = String(site.contactos?.telefone ?? '').trim();
+  if (!telefone) throw new Error('site.yaml: `contactos.telefone` tem de ter o telefone de contacto');
+  const linkTelefone = `<a href="tel:${escapar(telefone.replace(/\s/g, ''))}">${escapar(telefone)}</a>`;
+  paginas.forEach((f) => {
+    const ficheiro = path.join(DIST, f);
+    const html = fs.readFileSync(ficheiro, 'utf8').replace(/^([ \t]*)<!-- @social -->\r?\n?/gm, (_, indent) =>
+      social.length ? [`${indent}<ul class="social">`, ...social.map((li) => `${indent}  ${li}`), `${indent}</ul>`].join('\n') + '\n' : '')
+      .replace(/<!-- @email -->/g, linkEmail)
+      .replace(/<!-- @telefone -->/g, linkTelefone);
+    fs.writeFileSync(ficheiro, html);
+  });
+
   // Imagens: AVIF + WebP e <picture> em todas as páginas.
   const imagens = await converterImagens();
-  fs.readdirSync(DIST).filter((f) => f.endsWith('.html')).forEach((f) => usarPicture(path.join(DIST, f)));
+  paginas.forEach((f) => usarPicture(path.join(DIST, f)));
 
   // Sitemap: uma entrada por cada .html na raiz de src/ (index.html → raiz do site).
   const urls = fs.readdirSync(SRC)

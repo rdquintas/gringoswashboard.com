@@ -7,6 +7,16 @@ section_hero:
     - hero01.png
     - hero02.png
     - hero03.png
+  
+  cta1:
+    pt: "Contratar a Banda"
+    en: "Book the Band"
+    link: "#book"
+
+  cta2:
+    pt: "Masterclass"
+    en: "Masterclass"
+    link: "#masterclass"
 
   # Tempo (em segundos) que cada imagem fica visível antes de passar à seguinte
   duracao_hero: 3

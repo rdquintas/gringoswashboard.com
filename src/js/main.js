@@ -153,6 +153,13 @@
       });
     });
     if (moreBtn) moreBtn.addEventListener("click", function () { expanded = !expanded; renderTour(); });
+    // Toda a linha é clicável: um clique fora dos links segue o link do local
+    tour.addEventListener("click", function (e) {
+      if (e.target.closest("a, button") || String(window.getSelection())) return;
+      var li = e.target.closest("li");
+      var venue = li && li.querySelector(".venue");
+      if (venue) venue.click();
+    });
     renderTour();
   }
 

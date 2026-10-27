@@ -1,0 +1,4 @@
+{
+  // O SchemaStore associa "site.yaml" ao schema de playbooks do Ansible (falsos erros em src/conteudo/site.yaml)
+  "yaml.schemaStore.enable": false
+}
