@@ -173,6 +173,19 @@ function subirCaminhos(html, nivel) {
     atributo + (atributo.includes('srcset') ? valor.split(',').map((c) => c.trim().replace(/^\S+/, subir)).join(', ') : subir(valor)) + '"');
 }
 
+// Uma conversão em cache fica com a data de modificação do original; está válida enquanto as
+// datas forem iguais. Comparar só "mais recente" falha quando o original é substituído por um
+// ficheiro com data antiga (ex.: copiado de outro sítio, que mantém a data).
+function cacheValida(cache, origem) {
+  return fs.existsSync(cache)
+    && Math.abs(fs.statSync(cache).mtimeMs - fs.statSync(origem).mtimeMs) < 1; // utimes arredonda ao ms
+}
+
+function marcarCache(cache, origem) {
+  const { atime, mtime } = fs.statSync(origem);
+  fs.utimesSync(cache, atime, mtime);
+}
+
 // Converte cada PNG/JPG de src/images/ para AVIF e WebP em dist/images/, ao lado do original
 // (que fica como fallback). As conversões ficam em .cache/images/ e só se refazem quando o
 // original muda.
@@ -184,9 +197,10 @@ async function converterImagens() {
     const origem = path.join(SRC, 'images', f);
     const nome = f.replace(IMG_CONVERTIVEIS, '.' + ext);
     const cache = path.join(CACHE, nome);
-    if (!fs.existsSync(cache) || fs.statSync(cache).mtimeMs < fs.statSync(origem).mtimeMs) {
+    if (!cacheValida(cache, origem)) {
       fs.mkdirSync(path.dirname(cache), { recursive: true });
       await sharp(origem)[ext](opcoes).toFile(cache);
+      marcarCache(cache, origem);
       convertidas++;
     }
     fs.copyFileSync(cache, path.join(DIST, 'images', nome));
@@ -201,10 +215,11 @@ async function imagemOg(img, slug) {
   const origem = path.join(SRC, 'images', img);
   const cache = path.join(CACHE, 'og', img.replace(IMG_CONVERTIVEIS, '.jpg'));
   let convertida = false;
-  if (!fs.existsSync(cache) || fs.statSync(cache).mtimeMs < fs.statSync(origem).mtimeMs) {
+  if (!cacheValida(cache, origem)) {
     fs.mkdirSync(path.dirname(cache), { recursive: true });
     await sharp(origem).resize(OG.largura, OG.altura, { fit: 'cover' }).flatten({ background: '#ffffff' })
       .jpeg({ quality: OG.qualidade, mozjpeg: true }).toFile(cache);
+    marcarCache(cache, origem);
     convertida = true;
   }
   fs.mkdirSync(path.join(DIST, 'images', 'og'), { recursive: true });
