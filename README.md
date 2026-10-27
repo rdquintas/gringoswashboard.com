@@ -50,7 +50,7 @@ O vídeo em destaque (secção cinzenta, a seguir ao hero) vem de `section_singl
 As fotos da secção Média vêm de `section_media.fotos` em `src/conteudo/home.yaml`: uma lista de ficheiros em `src/images/` (têm de existir), sem limite. As duas primeiras ficam em destaque (maiores e inclinadas); as restantes vão para a grelha por baixo. Clicar numa abre-a em tamanho total.
 
 ## Texto da secção "Sobre" (Markdown)
-O texto da secção da banda no index vem de `section_about` em `src/conteudo/home.yaml` (`texto_pt` e `texto_en`, blocos `|-`), escrito em Markdown simples. Blocos separados por uma linha em branco:
+O texto da secção da banda no index vem de `section_about` em `src/conteudo/home.yaml` (`texto_pt` e `texto_en`, blocos `|-`), escrito em Markdown simples. O mesmo Markdown serve para as secções de texto do EPK, em `section_01`, `section_02`, `section_03` e `section_05` de `src/conteudo/epk.yaml` (`title.pt`/`title.en`, o título da secção, e `text.pt`/`text.en`, o texto). O vídeo do EPK vem de `section_04` (`title.pt`/`title.en` e `youtube`, link do vídeo, obrigatório). Blocos separados por uma linha em branco:
 
 | Escrever | Dá |
 |---|---|

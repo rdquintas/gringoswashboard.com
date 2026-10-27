@@ -560,7 +560,7 @@ async function main() {
 
   const idYoutube = (link, onde) => {
     const id = link.match(/(?:[?&]v=|youtu\.be\/|\/(?:embed|shorts|live)\/)([\w-]{11})/)?.[1];
-    if (!id) throw new Error(`home.yaml: \`${onde}\` não é um link do YouTube: ${link}`);
+    if (!id) throw new Error(`${onde} não é um link do YouTube: ${link}`);
     return id;
   };
 
@@ -570,7 +570,7 @@ async function main() {
   const destaque = config.section_single_video ?? {};
   const destaqueLink = String(destaque.youtube ?? '').trim();
   if (!destaqueLink) throw new Error('home.yaml: `section_single_video.youtube` tem de ter o link do vídeo');
-  const destaqueId = idYoutube(destaqueLink, 'section_single_video.youtube');
+  const destaqueId = idYoutube(destaqueLink, 'home.yaml: `section_single_video.youtube`');
   const destaqueHtml = (lingua, indent) => {
     const r = ROTULOS[lingua];
     const titulo = String(destaque[`title_${lingua}`] ?? '').trim();
@@ -598,7 +598,7 @@ async function main() {
   // Só com um, o contentor leva .video-grid--single (centrado e maior).
   const videos = ['youtube_1', 'youtube_2'].map((chave) => {
     const link = String(config.section_media?.[chave] ?? '').trim();
-    return link ? { link, id: idYoutube(link, `section_media.${chave}`) } : null;
+    return link ? { link, id: idYoutube(link, `home.yaml: \`section_media.${chave}\``) } : null;
   }).filter(Boolean);
   const videosHtml = (lingua, indent) => {
     if (!videos.length) return '';
@@ -642,6 +642,35 @@ async function main() {
   const epkPartilha = String(epk.image_share ?? '').trim();
   if (epkPartilha && !fs.existsSync(path.join(SRC, 'images', epkPartilha))) throw new Error(`epk.yaml: \`image_share\`: imagem não existe: images/${epkPartilha}`);
   if (epkPartilha && !IMG_CONVERTIVEIS.test(epkPartilha)) throw new Error(`epk.yaml: \`image_share\` tem de ser PNG ou JPG: ${epkPartilha}`);
+  // Secções do EPK (`section_01` a `section_03` e `section_05`): `title.<língua>` (h2) e `text.<língua>` (Markdown,
+  // como o `section_about`) no lugar de `<!-- @epk-section_NN -->`. Título vazio não é colocado.
+  const EPK_SECOES = ['section_01', 'section_02', 'section_03', 'section_05'];
+  const epkSecoes = Object.fromEntries(EPK_SECOES.map((secao) => [secao, Object.fromEntries(Object.keys(LINGUAS).map((lingua) => {
+    const onde = `epk.yaml: \`${secao}.text.${lingua}\``;
+    const titulo = String(epk[secao]?.title?.[lingua] ?? '').trim();
+    const texto = String(epk[secao]?.text?.[lingua] ?? '').trim();
+    if (!texto) throw new Error(`${onde} tem de ter o texto da secção`);
+    return [lingua, [...(titulo ? [`<h2 class="section-title reveal">${escapar(titulo)}</h2>`] : []), ...markdown(texto, onde)]];
+  }))]));
+
+  // Vídeo do EPK (`section_04`): o `title.<língua>` (h2, também na barra e nos rótulos do vídeo) e o
+  // embed (.embed.epk-video) do `youtube` (obrigatório) no lugar de `<!-- @epk-section_04 -->`.
+  const epkVideoLink = String(epk.section_04?.youtube ?? '').trim();
+  if (!epkVideoLink) throw new Error('epk.yaml: `section_04.youtube` tem de ter o link do vídeo');
+  const epkVideoId = idYoutube(epkVideoLink, 'epk.yaml: `section_04.youtube`');
+  const epkVideoHtml = (lingua, indent) => {
+    const r = ROTULOS[lingua];
+    const titulo = String(epk.section_04?.title?.[lingua] ?? '').trim();
+    const nome = titulo || "Gringo's Washboard Band";
+    return [
+      ...(titulo ? [`<h2 class="section-title reveal">${escapar(titulo)}</h2>`] : []),
+      `<div class="embed epk-video reveal" data-youtube="${epkVideoId}" data-title="${escapar(nome)}">`,
+      `  <img src="https://i.ytimg.com/vi/${epkVideoId}/maxresdefault.jpg" alt="${r.imagemVideo}: ${escapar(nome)}" loading="lazy" width="1280" height="720">`,
+      `  <div class="embed-bar"><span class="dot"></span>${escapar(nome)}</div>`,
+      `  <button class="embed-play" type="button" aria-label="${r.video}: ${escapar(nome)}"><i class="fa-solid fa-play"></i></button>`,
+      `</div>`,
+    ].map((l) => indent + l).join('\n');
+  };
 
   // Agenda (`section_agenda.gigs`): cada concerto com `isEnabled: true` tem uma página própria em cada
   // língua (`evento-<slug>.html`, slug a partir do `id`, gerada a partir de modelos/evento.html)
@@ -875,6 +904,10 @@ async function main() {
     }
     if (pagina === 'epk.html') {
       html = substituirMarcador(html, /^([ \t]*)<!-- @epk-hero -->/m, (_, indent) => epkHero.map((l) => indent + l).join('\n'), pagina);
+      for (const secao of EPK_SECOES) {
+        html = substituirMarcador(html, new RegExp(`^([ \\t]*)<!-- @epk-${secao}.*-->`, 'm'), (_, indent) => epkSecoes[secao][lingua].map((l) => indent + l).join('\n'), pagina);
+      }
+      html = substituirMarcador(html, /^([ \t]*)<!-- @epk-section_04.*-->/m, (_, indent) => epkVideoHtml(lingua, indent), pagina);
     }
     if (evento) html = substituirMarcador(html, /^([ \t]*)<!-- @evento -->/m, eventoHtml(evento, lingua), pagina);
     // `<!-- @idioma -->`: link para a mesma página nas outras línguas; `<!-- @hreflang -->`:

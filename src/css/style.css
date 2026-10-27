@@ -281,11 +281,12 @@ button { font: inherit; cursor: pointer; }
 .epk-cols > div + div { border-left: 3px solid var(--black); padding-left: 40px; }
 .epk-cols img { margin-top: 10px; box-shadow: 0 10px 24px rgba(0,0,0,.25); }
 .epk-video { max-width: 860px; margin-inline: auto; }
-.epk-specs dt { font-family: var(--f-head); font-weight: 600; font-size: 18px; text-transform: uppercase; letter-spacing: .03em; }
-.epk-specs dd { margin: 0 0 16px; }
-.epk-specs ul { list-style: disc; padding-left: 20px; }
-.epk-specs a { color: var(--ticket-red); text-decoration: underline; overflow-wrap: anywhere; }
-.epk-specs a:hover { color: var(--black); }
+/* Especificações técnicas (section_05): cada `### rótulo` do Markdown é um título pequeno sobre o valor. */
+#especificacoes h3 { font-size: 18px; text-align: left; letter-spacing: .03em; margin: 0; }
+#especificacoes h3 + p, #especificacoes h3 + ul { margin: 0 0 16px; }
+#especificacoes ul { list-style: disc; padding-left: 20px; }
+#especificacoes p a { color: var(--ticket-red); text-decoration: underline; overflow-wrap: anywhere; }
+#especificacoes p a:hover { color: var(--black); }
 
 /* ---------- Footer ---------- */
 .site-footer { background: var(--black); color: var(--white); padding: 34px 0 26px; font-size: 14px; position: relative; }
@@ -471,6 +472,8 @@ button { font: inherit; cursor: pointer; }
   /* minmax(0, 1fr): sem isto a coluna alarga até à largura da imagem (420px) e a página transborda. */
   .about-split { grid-template-columns: minmax(0, 1fr); }
   .about-split img { max-width: min(420px, 100%); }
+  /* Secções do epk.yaml: com as colunas empilhadas, a imagem fica centrada por baixo do texto. */
+  #apresentacao .about-split img, #trajetoria .about-split img, #root-of-the-oppressed .about-split img, #especificacoes .about-split img { margin-inline: auto; }
   .epk-cols { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .epk-cols > div + div { border-left: 0; padding-left: 0; }
 }
