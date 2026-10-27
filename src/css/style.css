@@ -70,6 +70,8 @@ button { font: inherit; cursor: pointer; }
 .social { display: flex; gap: 12px; }
 .social a { color: var(--gold); font-size: 17px; display: inline-block; }
 .social a:hover { color: var(--white); }
+.site-header .social { gap: 24px; }
+.site-header .social a { font-size: 34px; }
 .burger {
   background: none; border: 0; padding: 6px; width: 36px; height: 36px;
   display: flex; flex-direction: column; justify-content: center; gap: 5px;
