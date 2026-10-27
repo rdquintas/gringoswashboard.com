@@ -312,10 +312,8 @@ button { font: inherit; cursor: pointer; }
 .footer-nav ul a:hover { color: var(--white); }
 .footer-nav .social a { color: var(--white); }
 .footer-nav .social a:hover { color: var(--gold); }
-@media (min-width: 901px) {
-  .footer-nav .social { gap: 24px; }
-  .footer-nav .social a { font-size: 34px; }
-}
+.footer-nav .social { gap: 24px; flex-wrap: wrap; }
+.footer-nav .social a { font-size: 34px; }
 .footer-legal { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 14px 0 10px; color: #888; font-size: 14px; }
 .footer-legal a:hover { color: var(--gold); }
 .cookies-gerir { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
