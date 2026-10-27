@@ -25,42 +25,6 @@ section_hero:
   # Tempo (em segundos) que cada imagem fica visível antes de passar à seguinte
   duracao_hero: 3
 
-# Secção ABOUT 
-section_about:
-  # Membros da banda: nome, instrumento (pt e en) e foto (ficheiro em src/images/)
-  members:
-    - nome: Zé "Gringo" Tábuas
-      instrumento:
-        pt: Tábua de lavar e voz
-        en: Washboard & vocals
-      foto: musico01.png
-
-    - nome: Rita Banjo
-      instrumento:
-        pt: Banjo e voz
-        en: Banjo & vocals
-      foto: musico02.png
-
-    - nome: Tiago Cordas
-      instrumento:
-        pt: Guitarra
-        en: Guitar
-      foto: musico03.png
-
-    - nome: Nuno Tina
-      instrumento:
-        pt: Contrabaixo de tina
-        en: Washtub bass
-      foto: musico04.png
-
-    - nome: Inês Sopro
-      instrumento:
-        pt: Kazoo e harmónica
-        en: Kazoo & harmonica
-      foto: musico05.png
-
-
-
 # Secção AGENDA 
 section_agenda:
   # Imagens usadas nos concertos sem `imagem_h` (hero) ou sem `imagem_v_4x5` (hero_v; também na partilha)
