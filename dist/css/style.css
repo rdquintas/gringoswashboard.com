@@ -137,6 +137,8 @@ button { font: inherit; cursor: pointer; }
 }
 .btn--black { background: var(--black); color: var(--gold); border: 2px solid var(--gold); }
 .btn--black:hover { background: var(--gold); color: var(--black); }
+.btn--ticket { background: var(--ticket-red); color: var(--white); padding: 8px 22px; font-size: 14px; }
+.btn--ticket:hover { background: var(--black); }
 .btn--outline { background: transparent; color: var(--ticket-red); border: 1px solid var(--ticket-red); width: 100%; font-size: 14px; }
 .btn--outline:hover { background: var(--ticket-red); color: var(--white); }
 .btn--pill { background: var(--gold-hot); color: var(--black); border-radius: 999px; padding: 8px 20px; font-size: 14px; }
@@ -243,7 +245,7 @@ button { font: inherit; cursor: pointer; }
 .tour-tabs button { background: none; border: 0; padding: 0; color: var(--black); font-weight: 700; }
 .tour-tabs button.is-active { color: var(--ticket-red); text-decoration: underline; }
 .tour-list li {
-  display: grid; grid-template-columns: 150px 1fr 200px; align-items: center; gap: 12px;
+  display: grid; grid-template-columns: 150px 1fr 200px auto; align-items: center; gap: 12px;
   padding: 7px 0; font-size: 15px;
 }
 .tour-list li + li { border-top: 1px solid rgba(0,0,0,.08); }
@@ -252,6 +254,7 @@ button { font: inherit; cursor: pointer; }
 .tour-list .venue:hover { text-decoration: underline; }
 .tour-list .city { text-align: right; }
 .tour-list li.is-hidden { display: none; }
+.tour-list li.is-past .btn--ticket { background: #6f6f6f; pointer-events: none; }
 .tour-more { margin-top: 16px; }
 
 /* ---------- Live session (grey) ---------- */
@@ -427,8 +430,9 @@ button { font: inherit; cursor: pointer; }
    Responsive
    ========================================================= */
 @media (max-width: 900px) {
-  .tour-list li { grid-template-columns: 110px 1fr; }
+  .tour-list li { grid-template-columns: 110px 1fr auto; }
   .tour-list .city { grid-column: 2; grid-row: 2; text-align: left; color: #555; margin-top: -8px; }
+  .tour-list .btn--ticket { grid-column: 3; grid-row: 1 / span 2; }
   .members { grid-template-columns: repeat(3, 1fr); }
   /* minmax(0, 1fr): sem isto a coluna alarga até à largura da imagem (420px) e a página transborda. */
   .about-split { grid-template-columns: minmax(0, 1fr); }
@@ -453,10 +457,11 @@ button { font: inherit; cursor: pointer; }
   .footer-top, .contact-card { grid-template-columns: minmax(0, 1fr); }
   .newsletter .row { flex-direction: column; }
   .footer-nav { flex-direction: column; align-items: flex-start; }
-  .tour-list li { grid-template-columns: 1fr; gap: 2px 12px; padding: 10px 0; }
+  .tour-list li { grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 0; }
   .tour-list .date { grid-column: 1; }
   .tour-list .venue { grid-column: 1; }
   .tour-list .city { grid-column: 1; grid-row: auto; margin-top: 0; }
+  .tour-list .btn--ticket { grid-column: 2; grid-row: 1 / span 3; }
   .post .lead { font-size: 18px; }
   .hero-cta { flex-direction: column; align-items: center; gap: 10px; }
 }
