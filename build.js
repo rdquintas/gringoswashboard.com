@@ -5,6 +5,7 @@
 // original) e gera sitemap.xml e robots.txt.
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const sharp = require('sharp');
 
 const SRC = path.join(__dirname, 'src');
@@ -255,6 +256,15 @@ async function main() {
   if (!telefone) throw new Error('site.yaml: `contactos.telefone` tem de ter o telefone de contacto');
   const linkTelefone = `<a href="tel:${escapar(telefone.replace(/\s/g, ''))}">${escapar(telefone)}</a>`;
 
+  // Cache busting: os links para css/style.css e js/main.js levam `?v=<hash do conteúdo>`, para
+  // os browsers não usarem uma versão antiga em cache depois de um deploy.
+  const versoes = ['css/style.css', 'js/main.js'].map((recurso) => {
+    const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(DIST, recurso))).digest('hex').slice(0, 10);
+    return [recurso, `${recurso}?v=${hash}`];
+  });
+  const versionar = (html) => versoes.reduce((h, [recurso, comVersao]) =>
+    h.replace(new RegExp(`(\\s(?:href|src)=")${recurso.replace(/\./g, '\\.')}"`, 'g'), `$1${comVersao}"`), html);
+
   // URL público de uma página numa língua (index.html → raiz da pasta da língua).
   const url = (lingua, pagina) => SITE_URL + LINGUAS[lingua].pasta + (pagina === 'index.html' ? '' : pagina);
 
@@ -284,7 +294,7 @@ async function main() {
         .replace(/<!-- @idioma -->/g, idioma)
         .replace(/<!-- @email -->/g, linkEmail)
         .replace(/<!-- @telefone -->/g, linkTelefone);
-      html = usarPicture(html);
+      html = usarPicture(versionar(html));
       if (nivel) html = subirCaminhos(html, nivel);
       fs.writeFileSync(path.join(DIST, pasta, pagina), html);
     });
