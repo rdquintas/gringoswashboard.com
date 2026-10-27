@@ -14,7 +14,9 @@ const CONTEUDO = path.join(SRC, 'conteudo');
 const PARTIALS = path.join(SRC, 'partials');
 const MODELOS = path.join(SRC, 'modelos');
 const CACHE = path.join(__dirname, '.cache', 'images');
-const SITE_URL = 'https://gringoswashboard.com/';
+// URL público do site (og:url, og:image, sitemap). Por agora o do GitHub Pages; ao passar para o
+// domínio próprio, mudar para 'https://gringoswashboard.com/'.
+const SITE_URL = 'https://rdquintas.github.io/gringoswashboard.com/dist/';
 const HERO_FADE = 1.5; // segundos de crossfade entre imagens do hero
 const IMG_CONVERTIVEIS = /\.(png|jpe?g)$/i;
 // Línguas do site: pasta em dist/ (a primeira é a principal, na raiz), código para lang/hreflang,
@@ -44,6 +46,8 @@ const ROTULOS = {
 };
 // Imagem de partilha (og:image) dos concertos: JPG com estas medidas, a partir de `imagem_v_4x5`.
 const OG = { largura: 1440, altura: 1800, qualidade: 85 };
+// Favicons: PNG quadrados gerados a partir do logo, em dist/images/ (nome → lado em px).
+const FAVICON = { origem: 'logo.jpg', tamanhos: { 'favicon-32.png': 32, 'apple-touch-icon.png': 180 } };
 // Tamanho máximo do resumo de um concerto (meta description e og:description).
 const RESUMO_MAX = 200;
 // Redes aceites em `links` (redes sociais) do site.yaml: nome (aria-label) e ícone do Font
@@ -203,6 +207,14 @@ async function imagemOg(img, slug) {
   fs.mkdirSync(path.join(DIST, 'images', 'og'), { recursive: true });
   fs.copyFileSync(cache, path.join(DIST, 'images', 'og', `${slug}.jpg`));
   return convertida;
+}
+
+// Favicons (FAVICON) a partir do logo, em dist/images/.
+async function gerarFavicons() {
+  const origem = path.join(SRC, 'images', FAVICON.origem);
+  if (!fs.existsSync(origem)) throw new Error(`build.js: \`FAVICON.origem\`: imagem não existe: images/${FAVICON.origem}`);
+  await Promise.all(Object.entries(FAVICON.tamanhos).map(([nome, lado]) =>
+    sharp(origem).resize(lado, lado, { fit: 'cover' }).png().toFile(path.join(DIST, 'images', nome))));
 }
 
 // Slug para URLs: minúsculas, sem acentos, só letras, números e hífenes (ex.: "Hot Clube" → "hot-clube").
@@ -517,6 +529,7 @@ async function main() {
     ...eventos.filter((c) => String(c.imagem_v_4x5 ?? '').trim()).map((c) => imagemOg(String(c.imagem_v_4x5).trim(), c.slug)),
     ...(imagemPartilha ? [imagemOg(imagemPartilha, '_default')] : []),
   ])).filter(Boolean).length;
+  await gerarFavicons();
 
   // Sitemap: uma entrada por cada página em cada língua (index.html → raiz da língua); as dos
   // concertos têm a data do home.yaml.

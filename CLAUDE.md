@@ -33,7 +33,7 @@ Node 22 (`.nvmrc`, `netlify.toml`).
   - `css/style.css` — todos os estilos, organizados por secções (`/* ---------- Hero ---------- */`); cores e fontes como variáveis em `:root`.
   - `js/main.js` — JS vanilla sem dependências (IIFE): menu fullscreen, reveal ao fazer scroll, efeitos "tada"/pulse, agenda (tira concertos passados), newsletter (mock), ano no footer. Acrescenta a classe `js` ao `<html>`.
   - `images/` — `hero01–03.png` e `hero01–03_v.png` (slideshow do hero, horizontal 1920×900 e vertical 1080×1920), `band.jpg`, `musico01–05.png`.
-- **`dist/`** — gerado, mas **versionado** (o GitHub Pages serve-o e não corre build): correr `npm run build` e fazer commit de `dist/` junto com `src/`.
+- **`dist/`** — gerado, mas **versionado** (o GitHub Pages serve-o e não corre build): correr `npm run build` e fazer commit de `dist/` junto com `src/`. O `.nojekyll` na raiz impede o Jekyll do Pages de esconder ficheiros começados por `_` (ex.: `images/og/_default.jpg`).
 - **`netlify.toml`** — `npm run build`, publica `dist`, Node 22, cabeçalhos de segurança.
 
 ## Convenções
@@ -49,7 +49,7 @@ Node 22 (`.nvmrc`, `netlify.toml`).
 
 ## Imagens
 
-Pôr em `src/images/` só os originais (PNG/JPG). O build gera `.avif` e `.webp` ao lado de cada um em `dist/images/` (com `sharp`; qualidade em `FORMATOS` no `build.js`; cache em `.cache/images/`, refeita quando o original muda) e envolve cada `<img src="images/…">` das páginas num `<picture>` com `<source>` AVIF → WebP, ficando o `<img>` original como fallback. No HTML de `src/` escrever só o `<img>` normal. O CSS tem `picture { display: contents; }` para o `<picture>` não afetar o layout, mas seletores estruturais (`:nth-of-type`, `>`, `:first-child`) sobre imagens locais têm de contar com o `<picture>` (ex.: `.covers-big a:first-child img`).
+Pôr em `src/images/` só os originais (PNG/JPG). O build gera `.avif` e `.webp` ao lado de cada um em `dist/images/` (com `sharp`; qualidade em `FORMATOS` no `build.js`; cache em `.cache/images/`, refeita quando o original muda) e envolve cada `<img src="images/…">` das páginas num `<picture>` com `<source>` AVIF → WebP, ficando o `<img>` original como fallback. No HTML de `src/` escrever só o `<img>` normal. Os favicons (`images/favicon-32.png` e `images/apple-touch-icon.png`, ligados no `header.html`) são gerados pelo build a partir do `logo.jpg` (constante `FAVICON`). O CSS tem `picture { display: contents; }` para o `<picture>` não afetar o layout, mas seletores estruturais (`:nth-of-type`, `>`, `:first-child`) sobre imagens locais têm de contar com o `<picture>` (ex.: `.covers-big a:first-child img`).
 
 ## Caminhos
 

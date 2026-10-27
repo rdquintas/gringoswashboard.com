@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gringoswashboard.com/sitemap.xml
+Sitemap: https://rdquintas.github.io/gringoswashboard.com/dist/sitemap.xml
