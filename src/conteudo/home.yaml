@@ -83,7 +83,7 @@ section_agenda:
       info: 'O Entrelinhas é único. Com uma decoração cheia de personalidade e um ambiente acolhedor, é o local perfeito para desfrutar de música ao vivo de alta qualidade enquanto saboreia deliciosos cocktails e petiscos.'
       info_en: 'Entrelinhas is unique. With a decor full of personality and a welcoming atmosphere, it''s the perfect place to enjoy high-quality live music while savoring delicious cocktails and snacks.'
       imagem_h: 'pic01.jpg'
-      imagem_v_4x5: ''
+      imagem_v_4x5: 'pic01.jpg'
       isEnabled: true
 
     - id: festival-sudoeste-swing
@@ -100,7 +100,7 @@ section_agenda:
       info: 'Um fim de semana dedicado ao swing e ao jazz tradicional, com bandas ao vivo, aulas de dança abertas a todos e muito sol à beira do Mira.'
       info_en: 'A weekend dedicated to swing and traditional jazz, with live bands, dance classes open to everyone and plenty of sunshine by the Mira river.'
       imagem_h: 'pic02.jpg'
-      imagem_v_4x5: ''
+      imagem_v_4x5: 'pic02.jpg'
       isEnabled: true
 
     - id: hot-clube-lisboa
@@ -117,7 +117,7 @@ section_agenda:
       info: 'Uma das caves de jazz mais antigas da Europa. Sala pequena, som próximo e uma noite inteira de washboard, banjo e boa disposição.'
       info_en: 'One of the oldest jazz cellars in Europe. A small room, an up-close sound and a whole night of washboard, banjo and good vibes.'
       imagem_h: 'pic03.jpg'
-      imagem_v_4x5: ''
+      imagem_v_4x5: 'pic03.jpg  '
       isEnabled: true
 
     - id: casa-da-musica-porto
@@ -134,7 +134,7 @@ section_agenda:
       info: 'Um concerto especial de Natal com clássicos de Nova Orleães e algumas surpresas natalícias à moda dos Gringos. Ideal para toda a família.'
       info_en: 'A special Christmas concert with New Orleans classics and a few festive surprises, Gringos style. Perfect for the whole family.'
       imagem_h: 'pic04.jpg'
-      imagem_v_4x5: ''
+      imagem_v_4x5: 'pic04.jpg'
       isEnabled: true
 
     - id: masterclass-coimbra
@@ -151,7 +151,7 @@ section_agenda:
       info: 'Três horas para aprender os ritmos base da tábua de lavar, com instrumentos disponíveis no local. Não é preciso experiência, só vontade de fazer barulho.'
       info_en: 'Three hours to learn the basic washboard rhythms, with instruments available on site. No experience needed, just the will to make some noise.'
       imagem_h: 'pic05.jpg'
-      imagem_v_4x5: ''
+      imagem_v_4x5: 'pic05.jpg'
       isEnabled: true
 
     - id: reveillon-cascais
@@ -168,6 +168,6 @@ section_agenda:
       info: 'Entrada livre. Despedimo-nos do ano ao ar livre, com swing até à meia-noite e um brinde com toda a gente na praça.'
       info_en: 'Free entry. We say goodbye to the year outdoors, with swing until midnight and a toast with everyone in the square.'
       imagem_h: 'pic06.jpg'
-      imagem_v_4x5: ''
+      imagem_v_4x5: 'pic06.jpg'
       isEnabled: true
 
