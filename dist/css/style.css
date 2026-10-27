@@ -62,16 +62,9 @@ button { font: inherit; cursor: pointer; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 22px;
 }
-.logo {
-  font-family: var(--f-logo);
-  color: var(--gold);
-  font-size: 30px;
-  letter-spacing: .02em;
-  line-height: 1;
-  white-space: nowrap;
-}
-.logo .short { display: none; }
-.logo small { display: block; font-size: 14px; letter-spacing: .2em; }
+/* Logo com 100px de altura: sai do header (60px) e fica um pouco sobre o hero */
+.logo { align-self: flex-start; margin-top: 8px; }
+.logo img { border-radius:15px; display: block; height: 100px; width: auto; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
 .header-right { display: flex; align-items: center; gap: 18px; }
 .social { display: flex; gap: 12px; }
 .social a { color: var(--gold); font-size: 17px; display: inline-block; }
@@ -106,6 +99,7 @@ button { font: inherit; cursor: pointer; }
   color: var(--rust);
 }
 .menu nav a:hover, .menu nav a[aria-current="page"] { color: var(--gold); }
+.flag { display: inline-block; width: 1.2em; height: auto; vertical-align: middle; margin-left: .3em; border-radius: 2px; }
 .menu .social { justify-content: center; margin-top: 28px; display: none; }
 
 /* ---------- Curved separators ---------- */
@@ -314,7 +308,7 @@ button { font: inherit; cursor: pointer; }
 
 /* ---------- Footer ---------- */
 .site-footer { background: var(--black); color: var(--white); padding: 34px 0 26px; font-size: 14px; position: relative; }
-.footer-top { display: grid; grid-template-columns: 1fr 1.1fr; gap: 30px; align-items: start; margin-bottom: 30px; }
+.footer-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 30px; align-items: start; margin-bottom: 30px; }
 .footer-top h4 { font-size: 15px; margin-bottom: 2px; text-transform: uppercase; }
 .footer-top > div > p { color: #ccc; margin-bottom: 12px; }
 .newsletter .row { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -325,9 +319,11 @@ button { font: inherit; cursor: pointer; }
 .newsletter-msg { color: var(--gold); margin-top: 8px; min-height: 1em; }
 .contact-card {
   background: var(--card-dark); border-radius: 14px; padding: 22px;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
 }
 .contact-card div { display: flex; gap: 12px; }
+/* Os e-mails são compridos: deixar quebrar para não alargarem o cartão. */
+.contact-card p { min-width: 0; overflow-wrap: anywhere; }
 .contact-card i { font-size: 18px; margin-top: 3px; color: #ddd; }
 .contact-card strong { display: block; }
 .contact-card span, .contact-card a { color: #bbb; display: block; }
@@ -434,16 +430,14 @@ button { font: inherit; cursor: pointer; }
   .tour-list li { grid-template-columns: 110px 1fr; }
   .tour-list .city { grid-column: 2; grid-row: 2; text-align: left; color: #555; margin-top: -8px; }
   .members { grid-template-columns: repeat(3, 1fr); }
-  .about-split { grid-template-columns: 1fr; }
-  .about-split img { max-width: 420px; }
+  /* minmax(0, 1fr): sem isto a coluna alarga até à largura da imagem (420px) e a página transborda. */
+  .about-split { grid-template-columns: minmax(0, 1fr); }
+  .about-split img { max-width: min(420px, 100%); }
 }
 
 @media (max-width: 720px) {
   .site-header .social { display: none; }
   .menu .social { display: flex; }
-  .logo { font-size: 24px; }
-  .logo .full { display: none; }
-  .logo .short { display: block; }
   .curve { height: 50px; top: -49px; }
   .section-pad { padding: 34px 0 90px; }
   .video-row { grid-template-columns: repeat(2, 1fr); }
@@ -456,7 +450,7 @@ button { font: inherit; cursor: pointer; }
   .reviews { padding: 0 36px; }
   .reviews-track { min-height: 170px; }
   .reviews-arrow { width: 30px; }
-  .footer-top, .contact-card { grid-template-columns: 1fr; }
+  .footer-top, .contact-card { grid-template-columns: minmax(0, 1fr); }
   .newsletter .row { flex-direction: column; }
   .footer-nav { flex-direction: column; align-items: flex-start; }
   .tour-list li { grid-template-columns: 1fr; gap: 2px 12px; padding: 10px 0; }
@@ -464,6 +458,7 @@ button { font: inherit; cursor: pointer; }
   .tour-list .venue { grid-column: 1; }
   .tour-list .city { grid-column: 1; grid-row: auto; margin-top: 0; }
   .post .lead { font-size: 18px; }
+  .hero-cta { flex-direction: column; align-items: center; gap: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

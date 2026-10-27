@@ -2,7 +2,7 @@
 
 Site estático da **Gringos Washboard Band** (gringoswashboard.com), por agora publicado no **GitHub Pages** a partir de `dist/` (`https://rdquintas.github.io/gringoswashboard.com/dist/`); o `netlify.toml` fica preparado para mais tarde. O `README.md` tem a documentação completa; este ficheiro é o resumo para trabalhar no código.
 
-Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens do build e commits. O conteúdo do site está em inglês.
+Idioma do projeto: **português (pt-PT)** — código, comentários, mensagens do build e commits. O conteúdo do site está em português (`lang="pt-PT"`); nomes de canções, álbuns e publicações ficam no original.
 
 ## Estado atual
 

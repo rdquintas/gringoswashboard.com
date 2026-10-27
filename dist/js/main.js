@@ -95,7 +95,7 @@
     slides.forEach(function (_, i) {
       var b = document.createElement("button");
       b.type = "button";
-      b.setAttribute("aria-label", "Show review " + (i + 1));
+      b.setAttribute("aria-label", "Ver crítica " + (i + 1));
       b.addEventListener("click", function () { go(i); restart(); });
       dotsWrap.appendChild(b);
     });
@@ -141,7 +141,7 @@
       });
       if (moreBtn) {
         moreBtn.hidden = total <= VISIBLE;
-        moreBtn.textContent = expanded ? "Show fewer dates" : "Show all dates";
+        moreBtn.textContent = expanded ? "Ver menos datas" : "Ver todas as datas";
       }
     }
     tabs.forEach(function (t) {
@@ -179,7 +179,7 @@
       e.preventDefault();
       var wrap = document.createElement("div");
       wrap.className = "video-thumb video-thumb--playing";
-      var iframe = youtubePlayer(link.dataset.youtube, link.getAttribute("aria-label").replace(/^Play video on YouTube: /, ""));
+      var iframe = youtubePlayer(link.dataset.youtube, link.getAttribute("aria-label").replace(/^Ver vídeo no YouTube: /, ""));
       wrap.appendChild(iframe);
       link.replaceWith(wrap);
       iframe.focus();
@@ -192,7 +192,7 @@
     function play(e) {
       if (e) e.preventDefault();
       if (embed.classList.contains("is-playing")) return;
-      var iframe = youtubePlayer(embed.dataset.youtube, embed.dataset.title || "YouTube video");
+      var iframe = youtubePlayer(embed.dataset.youtube, embed.dataset.title || "Vídeo do YouTube");
       embed.classList.add("is-playing");
       embed.replaceChildren(iframe);
       iframe.focus();
@@ -215,11 +215,11 @@
       var msg = form.querySelector(".newsletter-msg");
       var email = form.querySelector('input[type="email"]');
       if (!email.value || !email.checkValidity()) {
-        msg.textContent = "Please enter a valid email.";
+        msg.textContent = "Introduz um e-mail válido.";
         email.focus();
         return;
       }
-      msg.textContent = "Thanks! You're on the list. Keep your washboard handy.";
+      msg.textContent = "Obrigado! Já estás na lista. Tem a tábua de lavar à mão.";
       form.reset();
     });
   });
