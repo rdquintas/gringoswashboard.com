@@ -42,6 +42,10 @@ body {
 }
 body.menu-open { overflow: hidden; }
 img { display: block; max-width: 100%; height: auto; }
+/* O build envolve as imagens locais em <picture> (AVIF/WebP); assim o layout é o do <img>. */
+picture { display: contents; }
+/* Sem isto, com o <picture> em display: contents, os <source> passam a itens da grelha/flex. */
+picture source { display: none; }
 a { color: inherit; text-decoration: none; transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
 h1, h2, h3, h4 { font-family: var(--f-head); font-weight: 600; line-height: 1.15; margin: 0 0 .5em; }
 p { margin: 0 0 1em; }
@@ -152,24 +156,26 @@ button { font: inherit; cursor: pointer; }
   position: relative; background: #1b1310;
   height: min(78vh, 760px); min-height: 360px; overflow: hidden;
 }
-/* Slideshow do hero: 3 imagens empilhadas em crossfade (ciclo de 21s, ~7s cada, fade de 1,5s) */
+/* Slideshow do hero: imagens empilhadas em crossfade. A animação (duração, delays e keyframes)
+   é gerada pelo build a partir de conteudo/home.yaml (hero, duracao_hero) e entra no marcador abaixo. */
 .hero img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  opacity: 0; animation: hero-fade 21s infinite;
+  opacity: 0;
 }
-.hero img:nth-of-type(1) { animation-delay: -1.5s; }
-.hero img:nth-of-type(2) { animation-delay: -15.5s; }
-.hero img:nth-of-type(3) { animation-delay: -8.5s; }
+.hero img { animation: hero-fade 9s infinite; }
+.hero picture:nth-of-type(1) img { animation-delay: -1.5s; }
+.hero picture:nth-of-type(2) img { animation-delay: -7.5s; }
+.hero picture:nth-of-type(3) img { animation-delay: -4.5s; }
 @keyframes hero-fade {
-  0%      { opacity: 0; }
-  7.14%   { opacity: 1; }
-  33.33%  { opacity: 1; }
-  40.48%  { opacity: 0; }
-  100%    { opacity: 0; }
+  0% { opacity: 0; }
+  16.67% { opacity: 1; }
+  33.33% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero img { animation: none; }
-  .hero img:nth-of-type(1) { opacity: 1; }
+  .hero picture:first-of-type img { opacity: 1; }
 }
 .hero-title {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -231,6 +237,9 @@ button { font: inherit; cursor: pointer; }
 }
 .video-thumb:hover img { transform: scale(1.06); filter: brightness(1); }
 .video-thumb:hover::after { background: var(--gold); color: var(--black); border-color: var(--gold); }
+.video-thumb--playing::after { content: none; }
+.video-thumb iframe, .embed iframe { width: 100%; height: 100%; border: 0; display: block; }
+.embed[data-youtube]:not(.is-playing) { cursor: pointer; }
 
 /* ---------- Agenda (gold) ---------- */
 .tour-poster { width: min(560px, 100%); margin: 0 auto 30px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }

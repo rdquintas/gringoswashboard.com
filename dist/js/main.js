@@ -162,6 +162,52 @@
     img.style.setProperty("--rot", r + "deg");
   });
 
+  /* ---------- YouTube: swap the thumbnail for the player on click ---------- */
+  function youtubePlayer(id, title) {
+    var iframe = document.createElement("iframe");
+    iframe.src = "https://www.youtube-nocookie.com/embed/" + id + "?autoplay=1&rel=0";
+    iframe.title = title;
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    iframe.allowFullscreen = true;
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    return iframe;
+  }
+
+  // Thumbnail links (a.video-thumb): the link is replaced by the player
+  document.querySelectorAll(".video-thumb[data-youtube]").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      var wrap = document.createElement("div");
+      wrap.className = "video-thumb video-thumb--playing";
+      var iframe = youtubePlayer(link.dataset.youtube, link.getAttribute("aria-label").replace(/^Play video on YouTube: /, ""));
+      wrap.appendChild(iframe);
+      link.replaceWith(wrap);
+      iframe.focus();
+    });
+  });
+
+  // Embeds (div.embed): the player replaces the still, bar and play button;
+  // links with data-play="<embed id>" start it too
+  document.querySelectorAll(".embed[data-youtube]").forEach(function (embed) {
+    function play(e) {
+      if (e) e.preventDefault();
+      if (embed.classList.contains("is-playing")) return;
+      var iframe = youtubePlayer(embed.dataset.youtube, embed.dataset.title || "YouTube video");
+      embed.classList.add("is-playing");
+      embed.replaceChildren(iframe);
+      iframe.focus();
+    }
+    embed.addEventListener("click", play);
+    if (embed.id) {
+      document.querySelectorAll('[data-play="' + embed.id + '"]').forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          play(e);
+          embed.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        });
+      });
+    }
+  });
+
   /* ---------- Newsletter (mock) ---------- */
   document.querySelectorAll(".newsletter").forEach(function (form) {
     form.addEventListener("submit", function (e) {

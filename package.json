@@ -9,5 +9,8 @@
   "scripts": {
     "build": "node build.js",
     "dev": "npm run build && npx serve dist"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
   }
 }
