@@ -3,11 +3,13 @@
     <div>
       <h4>{{#lang pt}}Newsletter da Gringo's{{/lang}}{{#lang en}}The Gringo's Newsletter{{/lang}}</h4>
       <p>{{#lang pt}}Inscreve-te para receberes novidades sobre música nova, concertos e um ou outro percalço com a tábua de lavar.{{/lang}}{{#lang en}}Sign up for news about new music, gigs and the occasional washboard mishap.{{/lang}}</p>
-      <form class="newsletter" novalidate>
+      <form class="newsletter" method="post" action="<!-- @newsletter -->" novalidate>
         <div class="row">
           <label class="visually-hidden" for="nl-email">{{#lang pt}}E-mail{{/lang}}{{#lang en}}Email{{/lang}}</label>
-          <input id="nl-email" type="email" name="email" placeholder="{{#lang pt}}O teu e-mail{{/lang}}{{#lang en}}Your email{{/lang}}" autocomplete="email" required>
+          <input id="nl-email" type="email" name="EMAIL" placeholder="{{#lang pt}}O teu e-mail{{/lang}}{{#lang en}}Your email{{/lang}}" autocomplete="email" required>
         </div>
+        <input class="visually-hidden" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="locale" value="pt">
         <button class="btn btn--gold" type="submit">{{#lang pt}}Subscrever novidades{{/lang}}{{#lang en}}Subscribe for updates{{/lang}}</button>
         <p class="newsletter-msg" role="status"></p>
       </form>

@@ -309,6 +309,17 @@ button { font: inherit; cursor: pointer; }
 }
 .newsletter input:focus { outline: 2px solid var(--gold); }
 .newsletter-msg { color: var(--gold); margin-top: 8px; min-height: 1em; }
+/* Painéis de sucesso/erro (classes postas pelo main.js depois da resposta da Brevo) */
+.newsletter-msg--ok, .newsletter-msg--erro {
+  display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px;
+  border: 1px solid currentColor; border-radius: 3px; max-width: 540px;
+}
+.newsletter-msg--erro { color: var(--white); border-color: var(--gold); }
+.newsletter-msg--ok::before, .newsletter-msg--erro::before {
+  font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 18px; line-height: 1; flex: none;
+}
+.newsletter-msg--ok::before { content: "\f058"; }
+.newsletter-msg--erro::before { content: "\f06a"; color: var(--gold); }
 .contact-card {
   background: var(--card-dark); border: 1px solid var(--text); border-radius: 14px; padding: 22px;
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;

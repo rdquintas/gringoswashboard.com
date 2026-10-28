@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Catamaran:wght@400;700&family=Oswald:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../css/style.css?v=a5f0ab9175">
+  <link rel="stylesheet" href="../css/style.css?v=526b4a7cb0">
   <script src="../js/palette.js?v=cdec4ae54f"></script>
 </head>
 <body class="page-light">
@@ -91,7 +91,7 @@
   <main>
     <article class="post legal">
       <h1>Privacy Policy</h1>
-      <div class="meta"><span><i class="fa-regular fa-calendar"></i>Last updated: 27 October 2026</span></div>
+      <div class="meta"><span><i class="fa-regular fa-calendar"></i>Last updated: 28 October 2026</span></div>
 
       <p class="lead">We take your privacy seriously: we collect as little as possible and never sell your data.</p>
 
@@ -100,7 +100,7 @@
 
       <h2>What data we collect</h2>
       <ul>
-        <li><strong>Newsletter:</strong> if you sign up, the email you give us, only to send you news about the band.</li>
+        <li><strong>Newsletter:</strong> if you sign up, the email you give us, only to send you news about the band. Every email has a link to unsubscribe.</li>
         <li><strong>Contact:</strong> whatever you send us by email, phone or WhatsApp, only to reply to you.</li>
         <li><strong>Visit statistics:</strong> if you accept cookies, Google Analytics collects usage data (pages viewed, device type, approximate country). See the <a href="politica-cookies.html">Cookie Policy</a>.</li>
         <li><strong>Technical logs:</strong> the service that hosts the site logs visitors' IP address and browser, for security reasons.</li>
@@ -114,7 +114,8 @@
       <ul>
         <li><strong>Google Fonts</strong> (typefaces) and <strong>cdnjs / Cloudflare</strong> (icons);</li>
         <li><strong>YouTube</strong> (privacy-enhanced mode, only when you click a video) and <strong>SoundCloud</strong> (music player);</li>
-        <li><strong>Google Analytics</strong>, only if you accept cookies.</li>
+        <li><strong>Google Analytics</strong>, only if you accept cookies;</li>
+        <li><strong>Brevo</strong> (Sendinblue SAS, France), which keeps the newsletter list and sends the emails on our behalf, only when you sign up (<a href="https://www.brevo.com/legal/privacypolicy/" target="_blank" rel="noopener">Brevo privacy policy</a>).</li>
       </ul>
       <p>Links to Facebook, Instagram, YouTube and WhatsApp take you to those services, which have their own privacy policies. Some of these providers may process data outside the European Union, under the safeguards provided for in the GDPR.</p>
 
@@ -136,11 +137,13 @@
         <div>
           <h4>The Gringo's Newsletter</h4>
           <p>Sign up for news about new music, gigs and the occasional washboard mishap.</p>
-          <form class="newsletter" novalidate>
+          <form class="newsletter" method="post" action="https://b8fef5a7.sibforms.com/serve/MUIFACPKVjsd0oML4DOsLsTBlesHAOytddeUnP-UegqUN0F8AZ_KbUZIF8BAlH7cirDb1Rp3GLZ8SvFVyIqj7C7CqaCZbc5CtZv09IfE6mzPrKKACV7N7RUiySnAUW8cguL3eZ8nTqI31YDhs4Ju7v0QfreQUPqecz2MQtBvAtJ6w90N1dAb7w7T6LbbH5_BdkB-sajOvBgx9PJb2g==" novalidate>
             <div class="row">
               <label class="visually-hidden" for="nl-email">Email</label>
-              <input id="nl-email" type="email" name="email" placeholder="Your email" autocomplete="email" required>
+              <input id="nl-email" type="email" name="EMAIL" placeholder="Your email" autocomplete="email" required>
             </div>
+            <input class="visually-hidden" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input type="hidden" name="locale" value="pt">
             <button class="btn btn--gold" type="submit">Subscribe for updates</button>
             <p class="newsletter-msg" role="status"></p>
           </form>
@@ -180,6 +183,6 @@
     </div>
   </footer>
 
-  <script src="../js/main.js?v=effdcd7224"></script>
+  <script src="../js/main.js?v=09a302fa0f"></script>
 </body>
 </html>

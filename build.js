@@ -801,6 +801,11 @@ async function main() {
   const gaId = String(site.google_analytics_id ?? '').trim();
   if (gaId && !/^G-[A-Z0-9]+$/.test(gaId)) throw new Error(`site.yaml: \`google_analytics_id\` tem de ser um ID do GA4 (G-XXXXXXXXXX): ${gaId}`);
   const metaAnalytics = (_, indent) => (gaId ? `${indent}<meta name="ga-id" content="${gaId}">\n` : '');
+  // Newsletter (`newsletter_brevo` do site.yaml): URL do formulário da Brevo (o `action` do
+  // `<form id="sib-form">` que a Brevo dá); `<!-- @newsletter -->` (no `action` do formulário do
+  // footer) leva esse URL. O main.js envia o formulário para lá por AJAX.
+  const newsletter = String(site.newsletter_brevo ?? '').trim();
+  if (!/^https:\/\/[\w-]+\.sibforms\.com\/serve\/\S+$/.test(newsletter)) throw new Error(`site.yaml: \`newsletter_brevo\` tem de ter o URL do formulário da Brevo (https://….sibforms.com/serve/…): ${newsletter}`);
 
   const paletas = gerarPaletas();
 
@@ -883,6 +888,7 @@ async function main() {
       .replace(/<!-- @idioma -->/g, idioma)
       .replace(/<!-- @email -->/g, linkEmail)
       .replace(/<!-- @telefone -->/g, linkTelefone)
+      .replace(/<!-- @newsletter -->/g, escapar(newsletter))
       .replace(/^([ \t]*)<!-- @whatsapp -->\r?\n?/gm, botaoWhatsapp(lingua));
     html = usarPicture(versionar(html));
     if (nivel) html = subirCaminhos(html, nivel);

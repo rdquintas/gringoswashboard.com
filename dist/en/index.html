@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Catamaran:wght@400;700&family=Oswald:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../css/style.css?v=a5f0ab9175">
+  <link rel="stylesheet" href="../css/style.css?v=526b4a7cb0">
   <script src="../js/palette.js?v=cdec4ae54f"></script>
 </head>
 <body>
@@ -225,11 +225,13 @@
         <div>
           <h4>The Gringo's Newsletter</h4>
           <p>Sign up for news about new music, gigs and the occasional washboard mishap.</p>
-          <form class="newsletter" novalidate>
+          <form class="newsletter" method="post" action="https://b8fef5a7.sibforms.com/serve/MUIFACPKVjsd0oML4DOsLsTBlesHAOytddeUnP-UegqUN0F8AZ_KbUZIF8BAlH7cirDb1Rp3GLZ8SvFVyIqj7C7CqaCZbc5CtZv09IfE6mzPrKKACV7N7RUiySnAUW8cguL3eZ8nTqI31YDhs4Ju7v0QfreQUPqecz2MQtBvAtJ6w90N1dAb7w7T6LbbH5_BdkB-sajOvBgx9PJb2g==" novalidate>
             <div class="row">
               <label class="visually-hidden" for="nl-email">Email</label>
-              <input id="nl-email" type="email" name="email" placeholder="Your email" autocomplete="email" required>
+              <input id="nl-email" type="email" name="EMAIL" placeholder="Your email" autocomplete="email" required>
             </div>
+            <input class="visually-hidden" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input type="hidden" name="locale" value="pt">
             <button class="btn btn--gold" type="submit">Subscribe for updates</button>
             <p class="newsletter-msg" role="status"></p>
           </form>
@@ -269,6 +271,6 @@
     </div>
   </footer>
 
-  <script src="../js/main.js?v=effdcd7224"></script>
+  <script src="../js/main.js?v=09a302fa0f"></script>
 </body>
 </html>

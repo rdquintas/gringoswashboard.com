@@ -274,19 +274,49 @@
     }
   });
 
-  /* ---------- Newsletter (mock) ---------- */
+  /* ---------- Newsletter (Brevo) ---------- */
+  // O `action` do formulário é o da Brevo (`newsletter_brevo` do site.yaml). Envia como o script
+  // da Brevo: POST para `action?isAjax=1`, resposta em JSON ({ success, message, errors }).
+  // Sem JS, o formulário é submetido normalmente e a Brevo mostra a página dela.
+  // `email_address_check` é o campo-armadilha da Brevo para bots (tem de ir vazio).
   document.querySelectorAll(".newsletter").forEach(function (form) {
+    var msg = form.querySelector(".newsletter-msg");
+    var email = form.querySelector('input[type="email"]');
+    var botao = form.querySelector('[type="submit"]');
+    // Mensagens iguais às do formulário criado na Brevo (painéis de sucesso/erro do código dela)
+    var emailInvalido = t("O email fornecido é inválido. Por favor corrige e tenta novamente.", "The email you entered is invalid. Please correct it and try again.");
+    // tipo: "ok" ou "erro" (painel com ícone, .newsletter-msg--ok/--erro); sem tipo, texto simples
+    function mostrar(texto, tipo) {
+      msg.textContent = texto;
+      msg.classList.toggle("newsletter-msg--ok", tipo === "ok");
+      msg.classList.toggle("newsletter-msg--erro", tipo === "erro");
+    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var msg = form.querySelector(".newsletter-msg");
-      var email = form.querySelector('input[type="email"]');
       if (!email.value || !email.checkValidity()) {
-        msg.textContent = t("Introduz um e-mail válido.", "Please enter a valid email.");
+        mostrar(emailInvalido, "erro");
         email.focus();
         return;
       }
-      msg.textContent = t("Obrigado! Já estás na lista. Tem a tábua de lavar à mão.", "Thanks! You're on the list. Keep your washboard handy.");
-      form.reset();
+      botao.disabled = true;
+      mostrar(t("A enviar…", "Sending…"));
+      fetch(form.action + "?isAjax=1", { method: "POST", body: new FormData(form) })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.success) {
+            mostrar(t("Subscrição feita com sucesso!", "You're subscribed!"), "ok");
+            form.reset();
+          } else if (res.errors && res.errors.EMAIL) {
+            mostrar(emailInvalido, "erro");
+            email.focus();
+          } else {
+            throw res;
+          }
+        })
+        .catch(function () {
+          mostrar(t("Não conseguimos guardar a tua subscrição. Tenta outra vez, por favor.", "We couldn't save your subscription. Please try again."), "erro");
+        })
+        .then(function () { botao.disabled = false; });
     });
   });
 

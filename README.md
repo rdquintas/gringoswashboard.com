@@ -37,7 +37,7 @@ Se o `push` só mexer em `src/` (ou no `build.js`/`package*.json`), o workflow `
 
 O conteúdo pode ser editado em [Pages CMS](https://app.pagescms.org/) (entrar com a conta do GitHub e abrir este repositório). A configuração está em `.pages.yml`, na raiz:
 
-- **Página inicial** → `src/conteudo/home.yaml` (hero, sobre, média, vídeo em destaque, agenda); **EPK** → `epk.yaml`; **Dados do site** → `site.yaml` (contactos, redes sociais, Google Analytics); **Paletas** → `paletas.yaml`.
+- **Página inicial** → `src/conteudo/home.yaml` (hero, sobre, média, vídeo em destaque, agenda); **EPK** → `epk.yaml`; **Dados do site** → `site.yaml` (contactos, redes sociais, Google Analytics, newsletter); **Paletas** → `paletas.yaml`.
 - **Imagens:** ficam em `src/images/` (PNG ou JPG). O CMS grava-as como `images/ficheiro.png`; o build aceita com ou sem `images/`.
 - Os textos em Markdown (sobre e EPK) usam um editor de código, para não estragar a sintaxe própria (`::: split`, `{.classe}`).
 - Ao gravar, o CMS faz commit no GitHub; o workflow faz o build e o commit de `dist/` (1–2 minutos) e o GitHub Pages publica.
@@ -54,7 +54,13 @@ O conteúdo pode ser editado em [Pages CMS](https://app.pagescms.org/) (entrar c
 ## Google Analytics e cookies
 - O ID do GA4 fica em `src/conteudo/site.yaml` (`google_analytics_id: 'G-…'`). Vazio = sem Google Analytics e sem aviso de cookies.
 - O GA só é carregado depois de o visitante aceitar no aviso de cookies (fundo do ecrã). A escolha fica guardada no browser e pode ser mudada em "Preferências de cookies", no footer ou na página da política de cookies.
-- Páginas legais: `src/privacidade.html` e `src/politica-cookies.html` (pt e en). Ao mudar o que o site recolhe (ex.: newsletter real, novos serviços externos), rever o texto e a data de atualização.
+- Páginas legais: `src/privacidade.html` e `src/politica-cookies.html` (pt e en). Ao mudar o que o site recolhe (ex.: novos serviços externos), rever o texto e a data de atualização.
+
+## Newsletter (Brevo)
+- O formulário do footer inscreve na lista da [Brevo](https://www.brevo.com/). O URL do formulário fica em `src/conteudo/site.yaml` (`newsletter_brevo`): é o `action` do `<form id="sib-form" …>` do código que a Brevo dá ao criar o formulário (`https://….sibforms.com/serve/…`). Obrigatório; o build dá erro se faltar ou não for da Brevo.
+- O script da Brevo (`sibforms.com/forms/end-form/build/main.js`, ~460 KB, com configuração em `<script>` inline) **não é usado**: a CSP não permite scripts inline e o formulário mantém o estilo do site. O `main.js` faz o mesmo pedido que ele (POST para `action?isAjax=1`, com `EMAIL`, o campo-armadilha `email_address_check` vazio e `locale`) e mostra as mensagens em pt/en. Sem JS, o formulário é enviado normalmente e a Brevo mostra a página dela.
+- As mensagens de erro/sucesso configuradas na Brevo não aparecem no site (são as do `main.js`); o e-mail de confirmação (double opt-in), se estiver ativo, é o da Brevo.
+- A Brevo está na política de privacidade (serviços de terceiros) e na CSP (`connect-src` e `form-action`, `https://*.sibforms.com`).
 
 ## Vídeos da secção Média
 Os dois vídeos da secção Média do index vêm de `section_media` em `src/conteudo/home.yaml` (`youtube_1` e `youtube_2`, links do YouTube, ex.: `https://www.youtube.com/watch?v=…` ou `https://youtu.be/…`). Um link vazio não é mostrado; sem nenhum, a grelha de vídeos não aparece.

@@ -240,6 +240,12 @@ content:
         description: Vazio, sem Google Analytics nem aviso de cookies.
         type: string
         pattern: "^(G-[A-Z0-9]+)?$"
+      - name: newsletter_brevo
+        label: Formulário da newsletter (Brevo)
+        description: URL do formulário da Brevo (o action do <form id="sib-form">, https://….sibforms.com/serve/…).
+        type: string
+        required: true
+        pattern: "^https://[A-Za-z0-9-]+\\.sibforms\\.com/serve/\\S+$"
 
   # ---------- src/conteudo/paletas.yaml ----------
   - name: paletas

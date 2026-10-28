@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Catamaran:wght@400;700&family=Oswald:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css?v=a5f0ab9175">
+  <link rel="stylesheet" href="css/style.css?v=526b4a7cb0">
   <script src="js/palette.js?v=cdec4ae54f"></script>
 </head>
 <body class="page-light">
@@ -91,7 +91,7 @@
   <main>
     <article class="post legal">
       <h1>Política de Privacidade</h1>
-      <div class="meta"><span><i class="fa-regular fa-calendar"></i>Última atualização: 27 de outubro de 2026</span></div>
+      <div class="meta"><span><i class="fa-regular fa-calendar"></i>Última atualização: 28 de outubro de 2026</span></div>
 
       <p class="lead">Levamos a tua privacidade a sério: recolhemos o mínimo possível e nunca vendemos os teus dados.</p>
 
@@ -100,7 +100,7 @@
 
       <h2>Que dados recolhemos</h2>
       <ul>
-        <li><strong>Newsletter:</strong> se te inscreveres, o e-mail que indicares, apenas para te enviarmos novidades da banda.</li>
+        <li><strong>Newsletter:</strong> se te inscreveres, o e-mail que indicares, apenas para te enviarmos novidades da banda. Cada envio tem um link para cancelares a inscrição.</li>
         <li><strong>Contactos:</strong> o que nos enviares por e-mail, telefone ou WhatsApp, apenas para te responder.</li>
         <li><strong>Estatísticas de visitas:</strong> se aceitares os cookies, o Google Analytics recolhe dados de utilização (páginas vistas, tipo de dispositivo, país aproximado). Ver a <a href="politica-cookies.html">Política de Cookies</a>.</li>
         <li><strong>Registos técnicos:</strong> o serviço que aloja o site regista, por razões de segurança, o endereço IP e o browser de quem o visita.</li>
@@ -114,7 +114,8 @@
       <ul>
         <li><strong>Google Fonts</strong> (tipos de letra) e <strong>cdnjs / Cloudflare</strong> (ícones);</li>
         <li><strong>YouTube</strong> (modo de privacidade reforçada, só quando carregas num vídeo) e <strong>SoundCloud</strong> (leitor de música);</li>
-        <li><strong>Google Analytics</strong>, só se aceitares os cookies.</li>
+        <li><strong>Google Analytics</strong>, só se aceitares os cookies;</li>
+        <li><strong>Brevo</strong> (Sendinblue SAS, França), que guarda a lista da newsletter e envia os e-mails em nosso nome, só quando te inscreves (<a href="https://www.brevo.com/legal/privacypolicy/" target="_blank" rel="noopener">política de privacidade da Brevo</a>).</li>
       </ul>
       <p>Os links para Facebook, Instagram, YouTube e WhatsApp levam-te para esses serviços, que têm as suas próprias políticas de privacidade. Alguns destes fornecedores podem tratar dados fora da União Europeia, ao abrigo das garantias previstas no RGPD.</p>
 
@@ -136,11 +137,13 @@
         <div>
           <h4>Newsletter da Gringo's</h4>
           <p>Inscreve-te para receberes novidades sobre música nova, concertos e um ou outro percalço com a tábua de lavar.</p>
-          <form class="newsletter" novalidate>
+          <form class="newsletter" method="post" action="https://b8fef5a7.sibforms.com/serve/MUIFACPKVjsd0oML4DOsLsTBlesHAOytddeUnP-UegqUN0F8AZ_KbUZIF8BAlH7cirDb1Rp3GLZ8SvFVyIqj7C7CqaCZbc5CtZv09IfE6mzPrKKACV7N7RUiySnAUW8cguL3eZ8nTqI31YDhs4Ju7v0QfreQUPqecz2MQtBvAtJ6w90N1dAb7w7T6LbbH5_BdkB-sajOvBgx9PJb2g==" novalidate>
             <div class="row">
               <label class="visually-hidden" for="nl-email">E-mail</label>
-              <input id="nl-email" type="email" name="email" placeholder="O teu e-mail" autocomplete="email" required>
+              <input id="nl-email" type="email" name="EMAIL" placeholder="O teu e-mail" autocomplete="email" required>
             </div>
+            <input class="visually-hidden" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input type="hidden" name="locale" value="pt">
             <button class="btn btn--gold" type="submit">Subscrever novidades</button>
             <p class="newsletter-msg" role="status"></p>
           </form>
@@ -180,6 +183,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js?v=effdcd7224"></script>
+  <script src="js/main.js?v=09a302fa0f"></script>
 </body>
 </html>
