@@ -373,7 +373,7 @@ button { font: inherit; cursor: pointer; }
 .footer-logo { display: block; width: fit-content; margin: 20px auto 12px; }
 .footer-logo img { display: block; height: 160px; width: auto; }
 .copyright { padding: 3rem; color: var(--text); font-size: 14px; margin: 0; text-align: center; }
-.copyright a { color: var(--gold); }
+.copyright a { color: var(--gold); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .copyright a:hover { color: var(--white); }
 
 /* ---------- Press archive ---------- */
