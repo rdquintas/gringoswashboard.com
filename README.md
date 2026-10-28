@@ -69,6 +69,7 @@ No texto: `**negrito**`, `*itálico*` (ou `_itálico_`), `[link](https://…)` (
 - Em `src/conteudo/paletas.yaml`, acrescentar à lista `paletas` o ID de uma paleta do [colorhunt.co](https://colorhunt.co/) (as 4 cores seguidas, sem `#`, ex.: `ff6082ffe4f6b26cff705eff`) ou o link dela.
 - O `npm run build` gera `dist/palettes/<id>.css` e escreve no fim o URL para a ver: `…/dist/?palete_id=<id>` (funciona em qualquer página e em inglês; os links internos mantêm o parâmetro).
 - O build escolhe sozinho o papel de cada cor (fundo de cada secção, destaques, botões) para o texto ficar legível (contraste ≥ 4,5); o fundo escuro do header/footer é a cor mais escura da paleta, escurecida. Os contrastes ficam no comentário do topo de cada CSS.
+- Temas escritos à mão: cada `src/palettes/<nome>.css` (minúsculas, dígitos e hífenes) vê-se com `?palete_id=<nome>`, como as paletas. Ex.: `vintage` (claro, papel/linho, texto castanho-tinta, acentos terracota).
 - Sem o parâmetro (ou com um ID que não esteja no YAML), o site fica com as cores originais do `style.css`.
 
 ## Notas

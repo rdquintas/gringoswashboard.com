@@ -1,0 +1,104 @@
+/* =========================================================
+   Tema "vintage" — escrito à mão (não gerado a partir do paletas.yaml)
+   Claro e minimalista: fundos papel/linho quase brancos, texto castanho-tinta em vez de preto,
+   acentos terracota e ocre esbatidos, sombras suaves e fotos com um leve tom sépia.
+   Carregado por cima do style.css com ?palete_id=vintage (ver js/palette.js).
+   ========================================================= */
+:root {
+  --papel: #fdfbf7;
+  --linho: #f5f0e7;
+  --areia: #ede6da;
+  --linha: #e0d7c8;
+  --tinta-suave: #7d7163;
+
+  --black: #463d34;      /* tinta: texto e contornos (já não é fundo) */
+  --text: #463d34;
+  --rust: #a5634a;       /* terracota: acento, hovers */
+  --gold: #c2a46d;       /* ocre esbatido */
+  --gold-hot: #e3cfa6;
+  --ticket-red: #9b5a42;
+  --grey-light: var(--papel);
+  --aqua: #eef0e8;       /* salva muito clara */
+  --card-dark: var(--papel);
+  --white: #fffdf9;
+}
+
+body { background: var(--papel); }
+
+/* Header e menu claros */
+.site-header { background: var(--papel); border-bottom: 1px solid var(--linha); }
+.logo img { box-shadow: 0 4px 12px rgba(70, 55, 40, .15); }
+.social a, .site-header .social a { color: var(--black); }
+.social a:hover { color: var(--rust); }
+.burger span { background: var(--black); }
+.menu { background: var(--papel); }
+.menu-close { color: var(--black); }
+.menu-close:hover { color: var(--rust); }
+.menu nav a { color: var(--black); font-weight: 400; letter-spacing: .08em; }
+.menu nav a:hover, .menu nav a[aria-current="page"] { color: var(--rust); }
+
+/* Secções: alternância branco/linho, sem grandes saltos de cor */
+.section--rust, .section--gold, .section--grey, .section--aqua, .section--black { color: var(--text); }
+.section--rust, .section--grey { background: var(--papel); }
+.section--gold { background: var(--linho); }
+.section--rust .sep, .section--grey .sep { color: var(--papel); }
+.section--gold .sep { color: var(--linho); }
+.section--black, .site-footer { background: var(--areia); color: var(--text); }
+.section--black .sep { color: var(--areia); }
+.section-title { font-weight: 400; letter-spacing: .14em; }
+.pullquote { color: var(--rust); font-family: var(--f-quote); font-weight: 400; }
+
+/* Botões */
+.btn--gold { background: var(--rust); color: var(--white); }
+.btn--gold:hover { background: var(--black); color: var(--white); }
+.btn--black { background: var(--white); color: var(--black); border: 1px solid var(--black); }
+.btn--black:hover { background: var(--black); color: var(--white); }
+.btn--ticket:hover { background: var(--black); }
+.btn--pill { color: var(--black); }
+.btn--pill:hover { background: var(--black); color: var(--white); }
+
+/* Hero */
+.hero, .evento-hero { background: var(--linho); }
+.hero-title { color: var(--white); text-shadow: 0 2px 18px rgba(40, 30, 20, .45); }
+.epk-subtitle { text-shadow: 0 1px 10px rgba(40, 30, 20, .5); }
+.hero-slide img, .covers-big img, .covers-grid img, .about-split img, .epk-cols img, .post-hero, .evento-hero img {
+  filter: sepia(.2) saturate(.85);
+}
+.epk-hero img { filter: sepia(.2) saturate(.85) brightness(.8); }
+
+/* Sombras mais leves */
+.tour-poster, .covers-big img, .covers-grid img, .about-split img, .section--gold .about-split img, .epk-cols img, .post-hero {
+  box-shadow: 0 6px 18px rgba(70, 55, 40, .16);
+}
+.tour-list li + li { border-top-color: var(--linha); }
+.tour-list li:hover { background: rgba(255, 253, 249, .7); }
+.epk-cols > div + div { border-left: 1px solid var(--linha); }
+
+/* Lightbox clara */
+.lightbox::backdrop { background: rgba(253, 251, 247, .94); }
+.lightbox img { box-shadow: 0 12px 36px rgba(70, 55, 40, .25); }
+.lightbox-close { background: var(--black); color: var(--white); }
+
+/* Footer */
+.footer-top > div > p { color: var(--tinta-suave); }
+.newsletter input { border-color: var(--linha); background: var(--white); color: var(--text); }
+.newsletter input:focus { outline-color: var(--rust); }
+.newsletter-msg { color: var(--rust); }
+.contact-card { border: 1px solid var(--linha); }
+.contact-card i { color: var(--rust); }
+.contact-card span, .contact-card a { color: var(--tinta-suave); }
+.contact-card a:hover { color: var(--rust); }
+.footer-nav { border-top-color: var(--linha); }
+.footer-nav ul a, .footer-nav .social a, .copyright a { color: var(--black); }
+.footer-nav ul a:hover, .footer-nav .social a:hover, .copyright a:hover,
+.footer-legal a:hover, .cookies-gerir:hover { color: var(--rust); }
+.footer-legal, .copyright { color: var(--tinta-suave); }
+
+/* Aviso de cookies */
+.cookies { background: var(--papel); color: var(--text); border: 1px solid var(--linha); box-shadow: 0 8px 24px rgba(70, 55, 40, .15); }
+.cookies a { color: var(--rust); }
+
+/* Imprensa, concertos e páginas legais */
+.page-light { background: var(--linho); }
+.post { color: #6b6056; }
+.card p { color: var(--tinta-suave); }

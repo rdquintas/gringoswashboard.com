@@ -499,6 +499,14 @@ function gerarPaletas() {
     fs.writeFileSync(path.join(DIST, 'palettes', `${id}.css`), css);
     return [id, crypto.createHash('sha256').update(css).digest('hex').slice(0, 10)];
   }));
+  // Temas escritos à mão (src/palettes/<nome>.css, já copiados para dist/): ?palete_id=<nome>.
+  const manuais = path.join(SRC, 'palettes');
+  if (fs.existsSync(manuais)) fs.readdirSync(manuais).filter((f) => f.endsWith('.css')).forEach((f) => {
+    const id = f.slice(0, -4);
+    if (!/^[a-z0-9-]+$/.test(id)) throw new Error(`palettes/${f}: o nome só pode ter minúsculas, dígitos e hífenes`);
+    versoes[id] = crypto.createHash('sha256').update(fs.readFileSync(path.join(manuais, f))).digest('hex').slice(0, 10);
+    ids.push(id);
+  });
   const js = path.join(DIST, 'js', 'palette.js');
   fs.writeFileSync(js, substituirMarcador(fs.readFileSync(js, 'utf8'), /\/\* @paletas \*\/ \{\}/, JSON.stringify(versoes), 'js/palette.js'));
   return ids;
