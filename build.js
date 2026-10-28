@@ -572,19 +572,17 @@ async function main() {
   };
 
   // Fotos da secção Média (`section_media.fotos`, ficheiros em images/), no lugar de
-  // `<!-- @fotos -->`: as duas primeiras em destaque (.covers-big), as outras em .covers-grid.
-  // Um contentor sem fotos não é colocado.
+  // `<!-- @fotos -->`: todas no .covers-grid (3 por linha no desktop, 2 no mobile).
+  // Sem fotos, o contentor não é colocado.
   const fotos = (config.section_media?.fotos ?? []).map((f) => String(f ?? '').trim()).filter(Boolean);
   fotos.forEach((f) => {
     if (!fs.existsSync(path.join(SRC, 'images', f))) throw new Error(`home.yaml: \`section_media.fotos\`: imagem não existe: images/${f}`);
   });
-  const fotosHtml = (indent) => [[fotos.slice(0, 2), 'covers-big'], [fotos.slice(2), 'covers-grid']]
-    .filter(([lista]) => lista.length)
-    .map(([lista, classe]) => [
-      `${indent}<div class="${classe} reveal">`,
-      ...lista.map((f) => `${indent}  <a class="fx-tada" href="images/${escapar(f)}"><img src="images/${escapar(f)}" alt="" loading="lazy"></a>`),
-      `${indent}</div>`,
-    ].join('\n')).join('\n');
+  const fotosHtml = (indent) => fotos.length ? [
+    `${indent}<div class="covers-grid reveal">`,
+    ...fotos.map((f) => `${indent}  <a class="fx-tada" href="images/${escapar(f)}"><img src="images/${escapar(f)}" alt="" loading="lazy"></a>`),
+    `${indent}</div>`,
+  ].join('\n') : '';
 
   // Hero do EPK (epk.yaml): `<!-- @epk-hero -->` em epk.html dá lugar à imagem `hero_horizontal`
   // (.hero-h) e à `hero_vertical` (.hero-v, o CSS mostra-a só em ecrãs na vertical).

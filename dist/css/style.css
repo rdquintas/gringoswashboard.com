@@ -240,20 +240,20 @@ button { font: inherit; cursor: pointer; }
 /* ---------- Music (gold) ---------- */
 .soundcloud { max-width: 760px; margin: 0 auto 50px; }
 .soundcloud iframe { width: 100%; height: 450px; border: 0; display: block; }
-.covers-big { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
-.covers-big a { display: block; }
-.covers-big img { width: min(240px, 42vw); aspect-ratio: 1; object-fit: cover; box-shadow: 0 16px 30px rgba(0,0,0,.45); }
-.covers-big a:first-child img { --rot: -3deg; }
-.covers-big a:last-child img { --rot: 3deg; }
-.covers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 520px; margin: 0 auto; }
+/* Galeria: 3 por linha a ocupar 70% da largura do ecrã (sai do .wrap); no mobile 2 por linha, a 90% */
+.covers-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  width: 70vw; margin-left: calc(50% - 35vw);
+}
+.covers-grid a { display: block; }
 .covers-grid img {
   width: 100%; aspect-ratio: 1; object-fit: cover;
-  box-shadow: 0 8px 16px rgba(0,0,0,.4);
+  box-shadow: 0 12px 24px rgba(0,0,0,.4);
+  transform: rotate(var(--rot, 0deg));
 }
-.covers-big img, .covers-grid img { transform: rotate(var(--rot, 0deg)); }
 /* Hover: "tada" no link (.fx-tada, como o botão do WhatsApp); por cima das vizinhas */
-.covers-big a, .covers-grid a { position: relative; }
-.covers-big a:hover, .covers-grid a:hover { z-index: 1; }
+.covers-grid a { position: relative; }
+.covers-grid a:hover { z-index: 1; }
 
 /* Lightbox das capas (<dialog> criado pelo JS) */
 .lightbox {
@@ -261,12 +261,21 @@ button { font: inherit; cursor: pointer; }
   max-width: 92vw; max-height: 92vh; overflow: visible;
 }
 .lightbox::backdrop { background: var(--black); }
-.lightbox img { display: block; max-width: 92vw; max-height: 92vh; width: auto; height: auto; box-shadow: 0 20px 50px rgba(0,0,0,.6); }
+.lightbox img { display: block; max-width: calc(100vw - 150px); max-height: 92vh; width: auto; height: auto; box-shadow: 0 20px 50px rgba(0,0,0,.6); }
 .lightbox-close {
   position: absolute; top: -14px; right: -14px; width: 36px; height: 36px; border-radius: 50%;
   border: 0; background: var(--gold); color: var(--black); font-size: 18px; cursor: pointer;
   display: grid; place-items: center;
 }
+/* Anterior / seguinte: fora da foto, à esquerda e à direita (por cima dela no mobile) */
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%;
+  border: 0; background: var(--gold); color: var(--black); font-size: 20px; cursor: pointer;
+  display: grid; place-items: center; box-shadow: 0 6px 16px rgba(0,0,0,.4);
+}
+.lightbox-prev { left: -64px; }
+.lightbox-next { right: -64px; }
+.lightbox-nav[hidden] { display: none; }
 .lightbox[open] { animation: lightbox-in 250ms var(--ease); }
 @keyframes lightbox-in { from { opacity: 0; transform: scale(.95); } }
 
@@ -498,7 +507,11 @@ button { font: inherit; cursor: pointer; }
   .section-pad { padding: 34px 0 90px; }
   .video-grid { grid-template-columns: 1fr; }
   .feature { grid-template-columns: 1fr; gap: 20px; }
-  .covers-grid { grid-template-columns: repeat(3, 1fr); }
+  .covers-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; width: 90vw; margin-left: calc(50% - 45vw); }
+  .lightbox img { max-width: 92vw; }
+  .lightbox-nav { width: 40px; height: 40px; font-size: 16px; }
+  .lightbox-prev { left: 8px; }
+  .lightbox-next { right: 8px; }
   .footer-top, .contact-card { grid-template-columns: minmax(0, 1fr); }
   .contact-card .contact-whatsapp { grid-column: auto; }
   .newsletter .row { flex-direction: column; }

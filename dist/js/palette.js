@@ -8,7 +8,7 @@
   "use strict";
 
   // id → versão do CSS (cache busting); preenchido pelo build.
-  var PALETAS = {"ff6082ffe4f6b26cff705eff":"824e982dd3","4f7d32ffd16af5b52ed9361e":"f0260565b9","d90000ffea938db355000000":"de1f1c2f67","fe7743efeeea273f4f000000":"5c584ebc01","000000830000bc0202ff0000":"35b7fb6ed6","0c0c0c481e149b3922f2613f":"b4281e9fcd","430a5d5f374b8c6a5deee4b1":"e0a431b27c","09251ca55704f3d2aff8eadc":"d1f84b99a8","fef3e2f4ae52d4621a2a1a0e":"e811cc0c6e","236d8c000000ff6600e0ddcf":"e696f58f16","f9f8f6efe9e3d9cfc7c9b59c":"466a15b362","fffaf3fff2dbffe5bff62440":"b4bb87cb6a","f9e6a8f2a900cc6f004d2a00":"487a34b16c","vintage":"177a92320d"};
+  var PALETAS = {"ff6082ffe4f6b26cff705eff":"824e982dd3","4f7d32ffd16af5b52ed9361e":"f0260565b9","d90000ffea938db355000000":"de1f1c2f67","fe7743efeeea273f4f000000":"5c584ebc01","000000830000bc0202ff0000":"35b7fb6ed6","0c0c0c481e149b3922f2613f":"b4281e9fcd","430a5d5f374b8c6a5deee4b1":"e0a431b27c","09251ca55704f3d2aff8eadc":"d1f84b99a8","fef3e2f4ae52d4621a2a1a0e":"e811cc0c6e","236d8c000000ff6600e0ddcf":"e696f58f16","f9f8f6efe9e3d9cfc7c9b59c":"466a15b362","fffaf3fff2dbffe5bff62440":"b4bb87cb6a","f9e6a8f2a900cc6f004d2a00":"487a34b16c","vintage":"dc6fb55b6b"};
   var script = document.currentScript;
   var id = (new URLSearchParams(location.search).get("palete_id") || "").toLowerCase();
   if (!script || !Object.prototype.hasOwnProperty.call(PALETAS, id)) return;

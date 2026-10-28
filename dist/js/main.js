@@ -140,31 +140,63 @@
     img.style.setProperty("--rot", r + "deg");
   });
 
-  /* ---------- Lightbox: a capa clicada abre em tamanho total; Esc ou clique fora fecha ---------- */
-  var coverLinks = document.querySelectorAll(".covers-big a, .covers-grid a");
+  /* ---------- Lightbox: a capa clicada abre em tamanho total; anterior/seguinte com os botões,
+     as setas do teclado ou a deslizar; Esc ou clique fora fecha ---------- */
+  var coverLinks = document.querySelectorAll(".covers-grid a");
   if (coverLinks.length && window.HTMLDialogElement) {
     var box = document.createElement("dialog");
     box.className = "lightbox";
     var boxImg = document.createElement("img");
-    var boxClose = document.createElement("button");
-    boxClose.type = "button";
-    boxClose.className = "lightbox-close";
-    boxClose.setAttribute("aria-label", t("Fechar", "Close"));
-    boxClose.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
-    box.append(boxImg, boxClose);
+    function boxButton(className, label, icon) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = className;
+      b.setAttribute("aria-label", label);
+      b.innerHTML = '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>';
+      return b;
+    }
+    var boxClose = boxButton("lightbox-close", t("Fechar", "Close"), "fa-xmark");
+    var boxPrev = boxButton("lightbox-nav lightbox-prev", t("Foto anterior", "Previous photo"), "fa-chevron-left");
+    var boxNext = boxButton("lightbox-nav lightbox-next", t("Foto seguinte", "Next photo"), "fa-chevron-right");
+    boxPrev.hidden = boxNext.hidden = coverLinks.length < 2;
+    box.append(boxImg, boxPrev, boxNext, boxClose);
     document.body.appendChild(box);
+
+    // Mostra a foto `i` (dá a volta nas pontas)
+    var current = 0;
+    function showCover(i) {
+      current = (i + coverLinks.length) % coverLinks.length;
+      var link = coverLinks[current];
+      var img = link.querySelector("img");
+      boxImg.src = link.href;
+      boxImg.alt = img ? img.alt : "";
+    }
 
     // Capa aberta com o rato: ao fechar, o foco que o <dialog> lhe devolve sai (sem contorno)
     var openedByMouse = null;
-    coverLinks.forEach(function (link) {
+    coverLinks.forEach(function (link, i) {
       link.addEventListener("click", function (e) {
         e.preventDefault();
         openedByMouse = e.detail > 0 ? link : null;
-        var img = link.querySelector("img");
-        boxImg.src = link.href;
-        boxImg.alt = img ? img.alt : "";
+        showCover(i);
         box.showModal();
       });
+    });
+    boxPrev.addEventListener("click", function () { showCover(current - 1); });
+    boxNext.addEventListener("click", function () { showCover(current + 1); });
+    box.addEventListener("keydown", function (e) {
+      if (coverLinks.length < 2) return;
+      if (e.key === "ArrowLeft") { e.preventDefault(); showCover(current - 1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); showCover(current + 1); }
+    });
+    // Deslizar na horizontal (ecrãs táteis)
+    var touchX = null;
+    box.addEventListener("touchstart", function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+    box.addEventListener("touchend", function (e) {
+      if (touchX === null || coverLinks.length < 2) return;
+      var dx = e.changedTouches[0].clientX - touchX;
+      touchX = null;
+      if (Math.abs(dx) > 50) showCover(current + (dx < 0 ? 1 : -1));
     });
     boxClose.addEventListener("click", function () { box.close(); });
     // Um clique no próprio <dialog> (e não na imagem) é um clique no fundo

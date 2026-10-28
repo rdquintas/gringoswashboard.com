@@ -60,13 +60,13 @@ body { background: var(--papel); }
 .hero, .evento-hero { background: var(--linho); }
 .hero-title { color: var(--white); text-shadow: 0 2px 18px rgba(40, 30, 20, .45); }
 .epk-subtitle { text-shadow: 0 1px 10px rgba(40, 30, 20, .5); }
-.hero-slide img, .covers-big img, .covers-grid img, .about-split img, .epk-cols img, .post-hero, .evento-hero img {
+.hero-slide img, .covers-grid img, .about-split img, .epk-cols img, .post-hero, .evento-hero img {
   filter: sepia(.2) saturate(.85);
 }
 .epk-hero img { filter: sepia(.2) saturate(.85) brightness(.8); }
 
 /* Sombras mais leves */
-.tour-poster, .covers-big img, .covers-grid img, .about-split img, .section--gold .about-split img, .epk-cols img, .post-hero {
+.tour-poster, .covers-grid img, .about-split img, .section--gold .about-split img, .epk-cols img, .post-hero {
   box-shadow: 0 6px 18px rgba(70, 55, 40, .16);
 }
 .tour-list li + li { border-top-color: var(--linha); }
@@ -76,7 +76,7 @@ body { background: var(--papel); }
 /* Lightbox clara */
 .lightbox::backdrop { background: rgba(253, 251, 247, .94); }
 .lightbox img { box-shadow: 0 12px 36px rgba(70, 55, 40, .25); }
-.lightbox-close { background: var(--black); color: var(--white); }
+.lightbox-close, .lightbox-nav { background: var(--black); color: var(--white); }
 
 /* Footer */
 .footer-top > div > p { color: var(--tinta-suave); }
