@@ -113,7 +113,7 @@ section_agenda:
 
   gigs:
     - id: entrelinhas
-      data: '20261107'
+      data: '20261027'
       name: Ao vivo no Entrelinhas
       location: Alverca
       time: '21:00'
@@ -127,7 +127,7 @@ section_agenda:
       info_en: 'Entrelinhas is unique. With a decor full of personality and a welcoming atmosphere, it''s the perfect place to enjoy high-quality live music while savoring delicious cocktails and snacks.'
       imagem_h: 'pic01.jpg'
       imagem_v_4x5: 'pic01.jpg'
-      isEnabled: true
+      isEnabled: false
 
     - id: festival-sudoeste-swing
       data: '20261108'
