@@ -42,8 +42,8 @@ const DATAS = {
 };
 // Textos da agenda e das páginas dos concertos gerados pelo build, por língua.
 const ROTULOS = {
-  pt: { bilhetes: 'Bilhetes', info: 'Informações', comprar: 'Comprar bilhetes', local: 'Local', mapa: 'Ver no mapa', voltar: 'Voltar à agenda', whatsapp: 'Conversar no WhatsApp', video: 'Ver vídeo no YouTube', imagemVideo: 'Imagem do vídeo' },
-  en: { bilhetes: 'Tickets', info: 'Info', comprar: 'Buy tickets', local: 'Venue', mapa: 'View on map', voltar: 'Back to tour dates', whatsapp: 'Chat on WhatsApp', video: 'Watch on YouTube', imagemVideo: 'Video still' },
+  pt: { info: 'Informações', comprar: 'Comprar bilhetes', local: 'Local', mapa: 'Ver no mapa', voltar: 'Voltar à agenda', whatsapp: 'Conversar no WhatsApp', video: 'Ver vídeo no YouTube', imagemVideo: 'Imagem do vídeo' },
+  en: { info: 'Info', comprar: 'Buy tickets', local: 'Venue', mapa: 'View on map', voltar: 'Back to tour dates', whatsapp: 'Chat on WhatsApp', video: 'Watch on YouTube', imagemVideo: 'Video still' },
 };
 // Imagem de partilha (og:image) dos concertos: JPG com estas medidas, a partir de `imagem_v_4x5`.
 const OG = { largura: 1440, altura: 1800, qualidade: 85 };
@@ -682,15 +682,12 @@ async function main() {
   const concertos = eventos.filter((c) => c.iso >= hojeIso);
   const agendaHtml = (lingua) => (_, indent) => concertos.map((c) => {
     const { dias, meses } = DATAS[lingua];
-    const bilhetes = campo(c, 'ticketsLink', lingua);
     return [
       `<li data-date="${c.iso}">`,
       `  <span class="date">${dias[c.dia.getUTCDay()]}, ${c.dia.getUTCDate()} ${meses[c.dia.getUTCMonth()]}</span>`,
       `  <a class="venue" href="${c.pagina}">${escapar(campo(c, 'name', lingua))}</a>`,
       `  <span class="city">${escapar(campo(c, 'location', lingua))}</span>`,
-      bilhetes
-        ? `  <a class="btn btn--ticket fx-tada" href="${escapar(bilhetes)}" target="_blank" rel="noopener">${ROTULOS[lingua].bilhetes}</a>`
-        : `  <a class="btn btn--ticket fx-tada" href="${c.pagina}">${ROTULOS[lingua].info}</a>`,
+      `  <a class="btn btn--ticket fx-tada" href="${c.pagina}">${ROTULOS[lingua].info}</a>`,
       '</li>',
     ].map((l) => indent + l).join('\n');
   }).join('\n') + (concertos.length ? '\n' : '');
