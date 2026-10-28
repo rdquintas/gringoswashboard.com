@@ -87,6 +87,34 @@
     el.addEventListener("animationend", function () { el.classList.remove("is-tada"); });
   });
 
+  /* ---------- Separadores em parallax: cada faixa do .sep anda a uma velocidade diferente ---------- */
+  // Com o separador abaixo do centro do ecrã as faixas descem (juntam-se); acima, sobem (afastam-se).
+  var seps = document.querySelectorAll(".sep");
+  if (seps.length && !reduceMotion) {
+    var SEP_VEL = [22, 12, 4]; // px de deslocamento máximo de cada faixa
+    var sepPendente = false;
+    var moverSeps = function () {
+      sepPendente = false;
+      var vh = window.innerHeight;
+      seps.forEach(function (sep) {
+        var r = sep.getBoundingClientRect();
+        if (r.bottom < -100 || r.top > vh + 100) return;
+        var p = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / (vh / 2)));
+        Array.prototype.forEach.call(sep.children, function (faixa, i) {
+          faixa.style.setProperty("--sep-y", (p * (SEP_VEL[i] || 0)).toFixed(1) + "px");
+        });
+      });
+    };
+    var pedirSeps = function () {
+      if (sepPendente) return;
+      sepPendente = true;
+      requestAnimationFrame(moverSeps);
+    };
+    window.addEventListener("scroll", pedirSeps, { passive: true });
+    window.addEventListener("resize", pedirSeps);
+    moverSeps();
+  }
+
   /* ---------- Tour ---------- */
   var tour = document.querySelector(".tour-list");
   if (tour) {

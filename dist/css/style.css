@@ -105,18 +105,28 @@ button { font: inherit; cursor: pointer; }
 .flag { display: inline-block; width: 1.2em; height: auto; vertical-align: middle; margin-left: .3em; border-radius: 2px; }
 .menu .social { justify-content: center; margin-top: 28px; display: none; }
 
-/* ---------- Curved separators ---------- */
+/* ---------- Separadores: faixas retas em parallax ---------- */
+/* Três faixas na cor da secção, por cima do fim da anterior; as opacidades somam-se num degradê
+   em degraus. O main.js desloca cada faixa a uma velocidade diferente (--sep-y) ao fazer scroll. */
 .section { position: relative; }
-.curve {
-  position: absolute; left: 0; width: 100%; height: 90px;
-  top: -89px; display: block; pointer-events: none;
+.sep {
+  position: absolute; left: 0; width: 100%; height: 60px;
+  top: -60px; pointer-events: none;
 }
-.curve path { fill: currentColor; }
-.section--rust .curve { color: var(--rust); }
-.section--gold .curve { color: var(--gold); }
-.section--grey .curve { color: var(--grey-light); }
-.section--aqua .curve { color: var(--aqua); }
-.section--black .curve { color: var(--black); }
+.sep span {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: currentColor;
+  transform: translateY(var(--sep-y, 0px));
+  will-change: transform;
+}
+.sep span:nth-child(1) { height: 60px; opacity: .3; }
+.sep span:nth-child(2) { height: 38px; opacity: .55; }
+.sep span:nth-child(3) { height: 16px; }
+.section--rust .sep { color: var(--rust); }
+.section--gold .sep { color: var(--gold); }
+.section--grey .sep { color: var(--grey-light); }
+.section--aqua .sep { color: var(--aqua); }
+.section--black .sep { color: var(--black); }
 
 .section--rust { background: var(--rust); color: var(--white); }
 .section--gold { background: var(--gold); }
@@ -489,7 +499,10 @@ button { font: inherit; cursor: pointer; }
 @media (max-width: 720px) {
   .site-header .social { display: none; }
   .menu .social { display: flex; }
-  .curve { height: 50px; top: -49px; }
+  .sep { height: 40px; top: -40px; }
+  .sep span:nth-child(1) { height: 40px; }
+  .sep span:nth-child(2) { height: 26px; }
+  .sep span:nth-child(3) { height: 10px; }
   .section-pad { padding: 34px 0 90px; }
   .video-grid { grid-template-columns: 1fr; }
   .feature { grid-template-columns: 1fr; gap: 20px; }
