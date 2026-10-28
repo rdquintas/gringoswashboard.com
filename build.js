@@ -623,7 +623,7 @@ async function main() {
     .filter(([lista]) => lista.length)
     .map(([lista, classe]) => [
       `${indent}<div class="${classe} reveal">`,
-      ...lista.map((f) => `${indent}  <a href="images/${escapar(f)}"><img src="images/${escapar(f)}" alt="" loading="lazy"></a>`),
+      ...lista.map((f) => `${indent}  <a class="fx-tada" href="images/${escapar(f)}"><img src="images/${escapar(f)}" alt="" loading="lazy"></a>`),
       `${indent}</div>`,
     ].join('\n')).join('\n');
 
