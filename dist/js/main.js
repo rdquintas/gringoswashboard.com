@@ -115,6 +115,27 @@
     moverSeps();
   }
 
+  /* ---------- Logo do header: esconde ao descer, volta ao subir (o CSS só o aplica no mobile) ---------- */
+  var logo = document.querySelector(".site-header .logo");
+  if (logo) {
+    var LOGO_DELTA = 8; // px mínimos de scroll para mudar de estado (evita tremer)
+    var ultimoY = window.scrollY;
+    var logoPendente = false;
+    var atualizarLogo = function () {
+      logoPendente = false;
+      var y = window.scrollY;
+      if (y <= 0) logo.classList.remove("is-escondido");
+      else if (Math.abs(y - ultimoY) < LOGO_DELTA) return;
+      else logo.classList.toggle("is-escondido", y > ultimoY);
+      ultimoY = y;
+    };
+    window.addEventListener("scroll", function () {
+      if (logoPendente) return;
+      logoPendente = true;
+      requestAnimationFrame(atualizarLogo);
+    }, { passive: true });
+  }
+
   /* ---------- Tour ---------- */
   var tour = document.querySelector(".tour-list");
   if (tour) {

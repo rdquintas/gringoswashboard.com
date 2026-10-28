@@ -500,6 +500,9 @@ button { font: inherit; cursor: pointer; }
 @media (max-width: 720px) {
   .site-header .social { display: none; }
   .menu .social { display: flex; }
+  /* Logo some ao descer e volta ao subir (classe posta pelo main.js) */
+  .site-header .logo { transition: opacity 400ms var(--ease), visibility 0s 0s; }
+  .site-header .logo.is-escondido { opacity: 0; visibility: hidden; transition: opacity 400ms var(--ease), visibility 0s 400ms; }
   .sep { height: 40px; top: -40px; }
   .sep span:nth-child(1) { height: 40px; }
   .sep span:nth-child(2) { height: 26px; }
