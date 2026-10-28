@@ -7,6 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const sharp = require('sharp');
+const YAML = require('yaml');
 
 const SRC = path.join(__dirname, 'src');
 const DIST = path.join(__dirname, 'dist');
@@ -69,74 +70,24 @@ const FORMATOS = [
   { ext: 'webp', type: 'image/webp', opcoes: { quality: 75 } },
 ];
 
-// Parser YAML mínimo (sem dependências): mapas (`chave: valor`) e listas (`- item`),
-// aninhados por indentação com espaços. Uma `chave:` sem valor abre um mapa ou uma lista,
-// consoante a primeira linha mais indentada que se lhe segue. Um item `- chave: valor` abre
-// um mapa, cujas restantes chaves vêm nas linhas seguintes, alinhadas com a primeira.
-// `chave: |` (ou `|-`, sem a quebra de linha final) abre um bloco de texto com as linhas
-// seguintes mais indentadas que a chave, tal como estão (sem comentários: `#` fica no texto).
+// Lê um YAML de src/conteudo/ (pacote `yaml`, YAML completo: os ficheiros também são escritos
+// pelo Pages CMS, ver .pages.yml). Nos textos tiram-se os espaços no fim das linhas e um caminho
+// de imagem escrito com `images/` (como o Pages CMS os grava) fica só com o nome do ficheiro,
+// como no resto do build.
 function lerYaml(ficheiro) {
-  const dados = {};
-  const CHAVE = /^([\w-]+):(?:\s+(.*))?$/;
-  // Contentores abertos, do mais exterior para o mais interior; `valor` fica null até se
-  // saber se a chave é um mapa ou uma lista.
-  const pilha = [{ indent: -1, valor: dados }];
-  // Valores entre aspas ficam sempre texto (ex.: '+351…'); só os outros podem ser números.
-  const escalar = (v) => {
-    v = v.trim();
-    const aspas = v.match(/^(['"])(.*)\1$/);
-    // Entre plicas, `''` é uma plica (como no YAML).
-    if (aspas) return aspas[1] === "'" ? aspas[2].replace(/''/g, "'") : aspas[2];
-    return v !== '' && !isNaN(v) ? Number(v) : v;
+  let dados;
+  try {
+    dados = YAML.parse(fs.readFileSync(ficheiro, 'utf8'));
+  } catch (e) {
+    throw new Error(`${path.basename(ficheiro)}: ${e.message}`);
+  }
+  const limpar = (v) => {
+    if (typeof v === 'string') return v.replace(/[ \t]+$/gm, '').replace(/^\/?images\/(?=\S+$)/, '');
+    if (Array.isArray(v)) return v.map(limpar);
+    if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, limpar(x)]));
+    return v;
   };
-  // Bloco de texto aberto (`chave: |`), com as linhas lidas até agora.
-  let bloco = null;
-  const fecharBloco = () => {
-    const linhas = bloco.linhas.join('\n').replace(/\n+$/, '').split('\n');
-    const margem = Math.min(...linhas.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length));
-    const texto = linhas.map((l) => l.slice(margem)).join('\n');
-    bloco.mapa[bloco.chave] = bloco.final && texto ? texto + '\n' : texto;
-    bloco = null;
-  };
-  const definir = (mapa, [, chave, valor = ''], indent) => {
-    const marca = valor.trim().match(/^\|(-?)$/);
-    if (marca) bloco = { mapa, chave, indent, final: !marca[1], linhas: [] };
-    else if (valor.trim() !== '') mapa[chave] = escalar(valor);
-    else {
-      mapa[chave] = null;
-      pilha.push({ indent, pai: mapa, chave, valor: null });
-    }
-  };
-  fs.readFileSync(ficheiro, 'utf8').split(/\r?\n/).forEach((linha, i) => {
-    if (bloco) {
-      if (!linha.trim() || linha.match(/^ */)[0].length > bloco.indent) return bloco.linhas.push(linha.trimEnd());
-      fecharBloco();
-    }
-    const texto = linha.replace(/\s+#.*$/, '').replace(/^\s*#.*$/, '').trimEnd();
-    if (!texto) return;
-    const erro = () => new Error(`${path.basename(ficheiro)}:${i + 1}: linha não suportada: ${linha}`);
-    const indent = texto.match(/^ */)[0].length;
-    while (pilha.length > 1 && pilha.at(-1).indent >= indent) pilha.pop();
-    const topo = pilha.at(-1);
-    const conteudo = texto.slice(indent);
-    let m;
-    if ((m = conteudo.match(/^-\s+(.*)$/))) {
-      if (topo.valor === null) topo.pai[topo.chave] = topo.valor = [];
-      if (!Array.isArray(topo.valor)) throw erro();
-      const chave = m[1].match(CHAVE);
-      if (!chave) return topo.valor.push(escalar(m[1]));
-      const item = {};
-      topo.valor.push(item);
-      pilha.push({ indent, valor: item });
-      definir(item, chave, texto.length - m[1].length);
-    } else if ((m = conteudo.match(CHAVE))) {
-      if (topo.valor === null) topo.pai[topo.chave] = topo.valor = {};
-      if (Array.isArray(topo.valor)) throw erro();
-      definir(topo.valor, m, indent);
-    } else throw erro();
-  });
-  if (bloco) fecharBloco();
-  return dados;
+  return limpar(dados ?? {});
 }
 
 // `conteudo` pode ser texto ou uma função de substituição (recebe o que o marcador apanhou).

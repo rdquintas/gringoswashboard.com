@@ -1,0 +1,255 @@
+# Configuração do Pages CMS (https://pagescms.org/) para editar o conteúdo do site.
+# O CMS edita os YAML de src/conteudo/ e as imagens de src/images/; ao gravar faz commit no
+# GitHub e o workflow .github/workflows/build.yml corre `npm run build` e faz commit de dist/.
+# Os campos seguem o que o build.js espera (ver CLAUDE.md / README); ao acrescentar uma chave
+# a um destes YAML, acrescentá-la também aqui (o CMS só mostra os campos aqui definidos).
+
+media:
+  input: src/images
+  output: images
+  extensions: [png, jpg, jpeg]
+
+components:
+  # Secção de texto do EPK (section_01 a 03 e 05): título e texto em Markdown, por língua.
+  secao_epk:
+    type: object
+    fields:
+      - name: title
+        label: Título
+        type: object
+        fields:
+          - { name: pt, label: PT, type: string }
+          - { name: en, label: EN, type: string }
+      - name: text
+        label: Texto (Markdown, como em "Sobre a banda")
+        type: object
+        fields:
+          - { name: pt, label: PT, type: code, options: { format: markdown } }
+          - { name: en, label: EN, type: code, options: { format: markdown } }
+
+content:
+  # ---------- src/conteudo/home.yaml ----------
+  - name: home
+    label: Página inicial
+    type: file
+    path: src/conteudo/home.yaml
+    format: yaml
+    fields:
+      - name: section_hero
+        label: Hero (slideshow no topo)
+        type: object
+        fields:
+          - name: hero
+            label: Imagens do slideshow
+            description: Pela ordem em que aparecem. Horizontal 1920×900 (desktop) e vertical 1080×1920 (telemóvel).
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{index}: {horizontal}"
+            fields:
+              - name: horizontal
+                label: Imagem horizontal
+                type: image
+                required: true
+              - name: vertical
+                label: Imagem vertical
+                type: image
+                required: true
+          - name: cta1
+            label: Botão 1 (dourado)
+            description: Com o link vazio, o botão não aparece.
+            type: object
+            fields:
+              - { name: pt, label: Texto (PT), type: string }
+              - { name: en, label: Texto (EN), type: string }
+              - { name: link, label: Link, type: string }
+          - name: cta2
+            label: Botão 2 (preto)
+            description: Com o link vazio, o botão não aparece.
+            type: object
+            fields:
+              - { name: pt, label: Texto (PT), type: string }
+              - { name: en, label: Texto (EN), type: string }
+              - { name: link, label: Link, type: string }
+          - name: duracao_hero
+            label: Segundos por imagem
+            description: Tem de ser maior que 1,5 (duração do crossfade).
+            type: number
+            required: true
+
+      - name: section_about
+        label: Sobre a banda
+        description: "Markdown: ## título, ### subtítulo, > citação em destaque, **negrito**, *itálico*, [texto](link), ![descrição](foto.jpg) (em images/), ::: split … ::: (texto e imagem lado a lado). Parágrafos separados por uma linha em branco."
+        type: object
+        fields:
+          - name: texto_pt
+            label: Texto (PT)
+            type: code
+            options: { format: markdown }
+          - name: texto_en
+            label: Texto (EN)
+            type: code
+            options: { format: markdown }
+
+      - name: section_media
+        label: Média (vídeos e fotos)
+        type: object
+        fields:
+          - name: youtube_1
+            label: Vídeo 1 (link do YouTube)
+            description: Vazio, não aparece.
+            type: string
+          - name: youtube_2
+            label: Vídeo 2 (link do YouTube)
+            description: Vazio, não aparece.
+            type: string
+          - name: fotos
+            label: Fotos
+            description: As duas primeiras ficam em destaque; as restantes vão para a grelha.
+            type: image
+            list: true
+
+      - name: section_single_video
+        label: Vídeo em destaque
+        type: object
+        fields:
+          - name: youtube
+            label: Link do YouTube
+            type: string
+            required: true
+          - { name: title_pt, label: Título (PT), type: string }
+          - { name: title_en, label: Título (EN), type: string }
+          - name: text_pt
+            label: Texto (PT)
+            description: Texto simples; cada linha é um parágrafo.
+            type: text
+          - name: text_en
+            label: Texto (EN)
+            description: Texto simples; cada linha é um parágrafo.
+            type: text
+
+      - name: section_agenda
+        label: Agenda
+        type: object
+        fields:
+          - name: default_images
+            label: Imagens por omissão
+            description: Usadas nos concertos sem imagem própria.
+            type: object
+            fields:
+              - { name: hero, label: Horizontal (hero), type: image }
+              - { name: hero_v, label: Vertical 4×5 (também na partilha), type: image }
+          - name: gigs
+            label: Concertos
+            description: Só aparecem os ativos; na lista do site só os de hoje em diante (as páginas dos passados continuam a existir).
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{data} — {name} ({location})"
+            fields:
+              - name: id
+                label: ID
+                description: Dá o endereço da página (evento-<id>.html). Minúsculas, números e hífenes; não repetir.
+                type: string
+                required: true
+                pattern: "^[a-z0-9-]+$"
+              - name: isEnabled
+                label: Ativo
+                type: boolean
+                default: true
+              - name: data
+                label: Data
+                type: date
+                required: true
+                options: { format: yyyyMMdd }
+              - name: time
+                label: Hora (HH:MM)
+                type: string
+                pattern: "^(([01][0-9]|2[0-3]):[0-5][0-9])?$"
+              - { name: name, label: Nome (PT), type: string, required: true }
+              - { name: name_en, label: Nome (EN), description: "Vazio, fica o português.", type: string }
+              - { name: location, label: Localidade (PT), type: string, required: true }
+              - { name: location_en, label: Localidade (EN), description: "Vazio, fica o português.", type: string }
+              - { name: info, label: Informação (PT), type: text }
+              - { name: info_en, label: Informação (EN), description: "Vazio, fica o português.", type: text }
+              - { name: ticketsLink, label: Link dos bilhetes, description: "Vazio, o botão leva à página do concerto.", type: string }
+              - { name: address, label: Morada, type: string }
+              - { name: mapsUrl, label: Link do mapa (Google Maps), type: string }
+              - { name: websiteUrl, label: Site do local, type: string }
+              - { name: phone, label: Telefone do local, type: string }
+              - { name: email, label: Email do local, type: string }
+              - { name: imagem_h, label: Imagem horizontal, description: "Vazia, fica a horizontal por omissão.", type: image }
+              - { name: imagem_v_4x5, label: Imagem vertical 4×5, description: "Também é a imagem de partilha. Vazia, fica a vertical por omissão.", type: image }
+
+  # ---------- src/conteudo/epk.yaml ----------
+  - name: epk
+    label: EPK (press kit)
+    type: file
+    path: src/conteudo/epk.yaml
+    format: yaml
+    fields:
+      - { name: hero_horizontal, label: Hero horizontal, type: image, required: true }
+      - { name: hero_vertical, label: Hero vertical, type: image, required: true }
+      - { name: image_share, label: Imagem de partilha, description: "Vazia, fica a do site.", type: image }
+      - { name: section_01, label: Apresentação, component: secao_epk }
+      - { name: section_02, label: Trajetória, component: secao_epk }
+      - { name: section_03, label: Root of the Oppressed, component: secao_epk }
+      - name: section_04
+        label: Vídeo
+        type: object
+        fields:
+          - name: title
+            label: Título
+            type: object
+            fields:
+              - { name: pt, label: PT, type: string }
+              - { name: en, label: EN, type: string }
+          - { name: youtube, label: Link do YouTube, type: string, required: true }
+      - { name: section_05, label: Especificações técnicas, component: secao_epk }
+
+  # ---------- src/conteudo/site.yaml ----------
+  - name: site
+    label: Dados do site
+    type: file
+    path: src/conteudo/site.yaml
+    format: yaml
+    fields:
+      - name: contactos
+        label: Contactos
+        type: object
+        fields:
+          - { name: telefone, label: Telefone, type: string, required: true }
+          - { name: whatsapp, label: WhatsApp, description: "Vazio, o botão não aparece.", type: string }
+          - { name: email, label: Email, type: string, required: true }
+      - name: links
+        label: Redes sociais
+        description: Uma rede com o link vazio não aparece.
+        type: object
+        fields:
+          - { name: facebook, label: Facebook, type: string }
+          - { name: instagram, label: Instagram, type: string }
+          - { name: youtube, label: YouTube, type: string }
+          - { name: spotify, label: Spotify, type: string }
+          - { name: soundcloud, label: SoundCloud, type: string }
+          - { name: bandcamp, label: Bandcamp, type: string }
+      - { name: default_share_image, label: Imagem de partilha (por omissão), type: image }
+      - name: google_analytics_id
+        label: ID do Google Analytics (G-…)
+        description: Vazio, sem Google Analytics nem aviso de cookies.
+        type: string
+        pattern: "^(G-[A-Z0-9]+)?$"
+
+  # ---------- src/conteudo/paletas.yaml ----------
+  - name: paletas
+    label: Paletas de cores (experiências)
+    type: file
+    path: src/conteudo/paletas.yaml
+    format: yaml
+    fields:
+      - name: paletas
+        label: Paletas do colorhunt.co
+        description: ID (as 4 cores seguidas, sem #) ou link da paleta. Ver em <site>?palete_id=<id>.
+        type: string
+        list: true

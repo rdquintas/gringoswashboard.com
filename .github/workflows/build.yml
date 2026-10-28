@@ -1,0 +1,62 @@
+# Build do site: gera dist/ e faz commit dele (o GitHub Pages serve dist/ e não corre build).
+# Corre quando muda algo que afeta o build (ex.: uma gravação no Pages CMS, que faz commit de
+# src/conteudo/ ou src/images/), todos os dias de manhã (para tirar da agenda os concertos que
+# já passaram) e à mão, no separador Actions. O commit feito com o GITHUB_TOKEN não volta a
+# disparar este workflow.
+name: Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'build.js'
+      - 'package.json'
+      - 'package-lock.json'
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # Imagens já convertidas (AVIF/WebP/OG), para não as refazer em cada build.
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: imagens-${{ hashFiles('src/images/**') }}
+          restore-keys: imagens-
+
+      - run: npm run build
+        env:
+          TZ: Europe/Lisbon
+
+      - name: Commit de dist/
+        run: |
+          git add -A dist
+          if git diff --cached --quiet; then
+            echo "dist/ sem alterações"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: dist/ atualizado (${GITHUB_SHA::7})"
+          git pull --rebase
+          git push

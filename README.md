@@ -14,6 +14,8 @@ src/              ficheiros do site (copiados para dist/ pelo build)
   images/         imagens (hero.jpg)
 build.js          build: limpa dist/, copia src/ para lá e gera sitemap.xml e robots.txt
 dist/             resultado do build; versionado, porque é o que o GitHub Pages serve
+.pages.yml        configuração do Pages CMS (edição do conteúdo)
+.github/workflows/build.yml  build automático + commit de dist/
 netlify.toml      configuração do Netlify (comando, pasta publicada, Node 22, cabeçalhos de segurança)
 ```
 
@@ -22,12 +24,25 @@ netlify.toml      configuração do Netlify (comando, pasta publicada, Node 22, 
 npm run build        # gera dist/
 npm run dev          # build + serve dist em http://localhost:3000/
 ```
-(`netlify dev` também serve.) Node 22 (`.nvmrc`). Não há dependências: o `npm install` não é necessário por agora.
+(`netlify dev` também serve.) Node 22 (`.nvmrc`). Antes do primeiro build: `npm install` (devDependencies `sharp`, conversão de imagens, e `yaml`, leitura dos YAML de `src/conteudo/`).
 
 ## Fluxo de trabalho
 1. Editar os ficheiros em `src/`.
 2. `npm run build` (o GitHub Pages não corre o build).
 3. `commit` + `push` na branch principal, **incluindo `dist/`**.
+
+Se o `push` só mexer em `src/` (ou no `build.js`/`package*.json`), o workflow `.github/workflows/build.yml` corre o build no GitHub e faz ele o commit de `dist/` (também corre todos os dias às 5h UTC, para tirar da agenda os concertos passados, e à mão em **Actions → Build → Run workflow**). Antes de trabalhar localmente, fazer `git pull` para trazer esses commits.
+
+## Pages CMS (edição do conteúdo)
+
+O conteúdo pode ser editado em [Pages CMS](https://app.pagescms.org/) (entrar com a conta do GitHub e abrir este repositório). A configuração está em `.pages.yml`, na raiz:
+
+- **Página inicial** → `src/conteudo/home.yaml` (hero, sobre, média, vídeo em destaque, agenda); **EPK** → `epk.yaml`; **Dados do site** → `site.yaml` (contactos, redes sociais, Google Analytics); **Paletas** → `paletas.yaml`.
+- **Imagens:** ficam em `src/images/` (PNG ou JPG). O CMS grava-as como `images/ficheiro.png`; o build aceita com ou sem `images/`.
+- Os textos em Markdown (sobre e EPK) usam um editor de código, para não estragar a sintaxe própria (`::: split`, `{.classe}`).
+- Ao gravar, o CMS faz commit no GitHub; o workflow faz o build e o commit de `dist/` (1–2 minutos) e o GitHub Pages publica.
+- O CMS reescreve o YAML inteiro ao gravar: **os comentários dos ficheiros perdem-se** e as aspas podem mudar (o build lê YAML normal, por isso não faz diferença).
+- Ao acrescentar uma chave a um destes YAML, acrescentá-la também no `.pages.yml` (o CMS só mostra os campos que lá estão).
 
 **Caminhos relativos:** no GitHub Pages o site não está na raiz do domínio, por isso os links para CSS, imagens, etc. têm de ser relativos (`css/site.css`, `images/hero.jpg`) e nunca começar por `/`.
 

@@ -26,8 +26,7 @@
 body { background: var(--papel); }
 
 /* Header e menu claros */
-.site-header { background: var(--papel); border-bottom: 1px solid var(--linha); }
-.logo img { box-shadow: 0 4px 12px rgba(70, 55, 40, .15); }
+.logo { box-shadow: 0 4px 12px rgba(70, 55, 40, .15); }
 .social a, .site-header .social a { color: var(--black); }
 .social a:hover { color: var(--rust); }
 .burger span { background: var(--black); }

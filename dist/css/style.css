@@ -60,13 +60,14 @@ button { font: inherit; cursor: pointer; }
 .site-header {
   position: fixed; inset: 0 0 auto 0; z-index: 100;
   height: var(--header-h);
-  background: var(--black);
+  background: transparent;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 22px;
 }
 /* Logo com 100px de altura: sai do header (60px) e fica um pouco sobre o hero */
-.logo { align-self: flex-start; margin-top: 8px; }
-.logo img { border-radius:15px; display: block; height: 100px; width: auto; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+/* Círculo 10px maior que a imagem: padding no link, com o preto do fundo do logo */
+.logo { align-self: flex-start; margin-top: 8px; padding: 10px; background: #000; border-radius: 50%; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+.logo img { border-radius: 50%; display: block; height: 100px; width: auto; }
 .header-right { display: flex; align-items: center; gap: 18px; }
 .social { display: flex; gap: 12px; }
 .social a { color: var(--gold); font-size: 17px; display: inline-block; }
@@ -154,7 +155,6 @@ button { font: inherit; cursor: pointer; }
 
 /* ---------- Hero ---------- */
 .hero {
-  margin-top: var(--header-h);
   position: relative; background: var(--black);
   height: min(78vh, 760px); min-height: 360px; overflow: hidden;
 }
@@ -405,7 +405,7 @@ button { font: inherit; cursor: pointer; }
    (regras de .hero-h/.hero-v na secção Hero). A imagem aparece inteira, sem cortes: largura total,
    altura proporcional e, se passar de 42vh, encolhe (com o fundo escuro dos lados). Com hero, o
    cartão do artigo sobe um pouco sobre a imagem. */
-.evento-hero { margin-top: var(--header-h); background: var(--black); }
+.evento-hero { background: var(--black); }
 .evento-hero img { width: 100%; height: auto; max-height: 42vh; object-fit: contain; margin-inline: auto; }
 .post.evento { margin-top: calc(var(--header-h) + 30px); }
 .evento-hero + .post.evento { position: relative; margin-top: -60px; }
